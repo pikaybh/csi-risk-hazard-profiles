@@ -1,0 +1,555 @@
+var equipmentSpec ={  
+	 nodeName:"",
+	 spec:{},
+	 htmlNode:null,
+	 yearOption:"",
+	 specSeq:0,
+	 defaultData:{
+		 equipment_seq:"",
+         equipment_cd:"",
+         equipment_nm:"",
+         spec_standard:"",
+         prod_yyyy:"",
+         insurance_yn:"",
+         pilot_yn:"",
+         career_lnm_year:"",
+         career_lrm_year:"",
+         career_tnm_year:"",
+         career_trm_year:"",
+         spec001 :"",
+         spec002 :"",
+         spec003 :"",
+    
+	 },		  
+	 init:function(){
+		 $(".createTag").remove();
+	 },
+	 onChangePilotYn:function(el,seq){
+//		 console.log("onChangePilotYnseq" ,el.value );
+		 
+			if(el.value == "N") {
+				$('input[name="career_lnm_year'+seq+'"]').val("");    
+				$('input[name="career_lrm_year'+seq+'"]').val("");   
+				$('input[name="career_tnm_year'+seq+'"]').val("");   
+				$('input[name="career_trm_year'+seq+'"]').val("");  
+				$('select[name="pilot_license'+seq+'"]').val("");   
+				$('input[name="career_lnm_year'+seq+'"]').prop("readonly",true);    
+				$('input[name="career_lrm_year'+seq+'"]').prop("readonly",true);
+				$('input[name="career_tnm_year'+seq+'"]').prop("readonly",true);   
+				$('input[name="career_trm_year'+seq+'"]').prop("readonly",true);   
+				$('select[name="pilot_license'+seq+'"]').attr("disabled","disabled");   
+			}else{
+				$('input[name="career_lnm_year'+seq+'"]').prop("readonly",false);    
+				$('input[name="career_lrm_year'+seq+'"]').prop("readonly",false);
+				$('input[name="career_tnm_year'+seq+'"]').prop("readonly",false);   
+				$('input[name="career_trm_year'+seq+'"]').prop("readonly",false);   
+				$('select[name="pilot_license'+seq+'"]').removeAttr("disabled");   
+				
+		 	}	
+			
+		 },
+		 onNumberCheck:function(el){
+			   var dotDupCheckPattern = /^\d*[.]\d*$/ ;
+			   var digitCheckPattern = /(^\d+$)|(^\d{1,}.\d{0,2}$)/;
+			   var resultNumber = el.value.replace(/[^0-9.]/g,'').replace(/(\..*)\.g/, '$1')
+				  
+			  if (!dotDupCheckPattern.test(resultNumber)){
+				  resultNumber=  resultNumber.replace(/\./g,'')
+			  }
+			   if (!digitCheckPattern.test(resultNumber)){
+					  resultNumber=  resultNumber.slice(0,-1)
+			   }
+			  el.value = resultNumber;
+				 	 
+			 },
+	 common:{
+		 inputHtml:function(spec){
+	 
+					 var html ='';
+					      html  +=' <tr class="createTag" >'
+						  html  +=' 	<th class="td-header">길이</th>' 
+						  html	+=' 	<td  class="t-left">' 
+						  html	+='	 		<input type="text" name="spec_length" style="width:100px"  oninput ="equipmentSpec.onNumberCheck(this)"  class="form-control" value='+spec.spec_length+'><span style="font-size:12px"> ㎜</span>'
+						  html  +=' 	</td> '
+						  html	+='		<th class="td-header">너비 </th>'
+						  html	+=' 	<td  class="t-left">'
+						  html	+='	 		<input type="text" name="spec_width" style="width:100px"  oninput ="equipmentSpec.onNumberCheck(this)"  class="form-control" value='+spec.spec_width+'><span style="font-size:12px"> ㎜</span>'
+						  html  +=' 	</td>'
+						  html  +='  </tr> '
+							  
+				          html  +=' <tr class="createTag" >'
+						  html  +=' 	<th class="td-header">높이</th>' 
+						  html	+=' 	<td  class="t-left">' 
+						  html	+='	 		<input type="text" name="spec_height" style="width:100px"  oninput ="equipmentSpec.onNumberCheck(this)"  class="form-control" value='+spec.spec_height+'><span style="font-size:12px"> ㎜</span>'
+						  html  +=' 	</td> '
+						  html	+='		<th class="td-header">자체중량 </th>'
+						  html	+=' 	<td  class="t-left">'
+						  html	+='	 		<input type="text" name="spec_weight" style="width:100px"  oninput ="equipmentSpec.onNumberCheck(this)"  class="form-control" value='+spec.spec_weight+'><span style="font-size:12px"> ㎏</span>'
+						  html  +=' 	</td>'
+						  html  +='</tr> '
+							  
+/*						  html  +=' <tr class="createTag" >'
+						  html  +=' 	<th class="td-header">최저지상고</th>' 
+						  html	+=' 	<td  class="t-left">' 
+						  html	+='	 		<input type="text" name="min_ground" style="width:100px"  oninput ="equipmentSpec.onNumberCheck(this)"  class="form-control" value='+spec.min_ground+'><span style="font-size:12px"> ㎜</span>'
+						  html  +=' 	</td> '
+						  html	+='		<th class="td-header">등판능력 </th>'
+						  html	+=' 	<td  class="t-left">'
+						  html	+='	 		<input type="text" name="spec_climb_algle" style="width:100px"  oninput ="equipmentSpec.onNumberCheck(this)"  class="form-control" value='+spec.spec_climb_algle+'><span style="font-size:12px">°</span>'
+						  html  +=' 	</td>'
+						  html  +='</tr> '*/
+								  	
+						return 	html;
+		 },
+	    searchHtml:function(){
+				 
+				 var html ='';
+				      html  +=' <tr class="createTag"> '
+				      html  +=' 	<td class="td-header t-left">길이</td>' 
+					  html	+=' 	<td>' 
+					  html	+='	  		<input type="text" name="spec_length_min" style="width:80px"  class="form-control"><span style="font-size: 14px; margin-right: 10px;"> ㎜ 이상 ~</span>'
+					  html	+='	  		<input type="text" name="spec_length_max" style="width:80px"  class="form-control"><span style="font-size: 14px; margin-right: 10px;"> ㎜ 이하</span>'	 
+					  html	+='	  	</td>'  
+					  html  +='		<td class="td-header t-left">너비</td>'
+					  html	+=' 	<td>'
+					  html	+='			<input type="text" name="spec_width_min" style="width:80px"  class="form-control"><span style="font-size: 14px; margin-right: 10px;"> ㎜ 이상 ~</span>'
+					  html	+='			<input type="text" name="spec_width_max" style="width:80px"  class="form-control"><span style="font-size: 14px; margin-right: 10px;"> ㎜ 이하</span>'
+					  html	+='	  	</td>'  
+					  html  +=' </tr> '
+					  html  +=' <tr class="createTag" >' 
+					  html  +=' 	<td class="td-header t-left">높이</td>' 
+					  html	+=' 	<td>' 
+					  html	+='	  		<input type="text" name="spec_height_min" style="width:80px"  class="form-control"><span style="font-size: 14px; margin-right: 10px;">㎜ 이상 ~</span>'
+					  html	+='	  		<input type="text" name="spec_height_max" style="width:80px"  class="form-control"><span style="font-size: 14px; margin-right: 10px;">㎜ 이하</span>'	  
+					  html	+='	  	</td>'  
+					  html  +='		<td class="td-header t-left">자체중량</td>'
+					  html	+=' 	<td>'
+					  html	+='			<input type="text" name="spec_weight_min" style="width:80px"  class="form-control"><span style="font-size: 14px; margin-right: 10px;"> ㎏ 이상 ~</span>'
+					  html	+='			<input type="text" name="spec_weight_max" style="width:80px"  class="form-control"><span style="font-size: 14px; margin-right: 10px;"> ㎏ 이하</span>'
+					  html	+='	  	</td>'  
+					  html  +=' </tr> '	
+					  
+					/*  html  +=' <tr class="createTag" >' 
+					  html  +=' 	<td class="td-header t-left">최저지상고</td>' 
+					  html	+=' 	<td>' 
+					  html	+='	  		<input type="text" name="min_ground_min" style="width:80px"  class="form-control"><span style="font-size: 14px; margin-right: 10px;">㎜ 이상 ~</span>'
+					  html	+='	  		<input type="text" name="min_ground_max" style="width:80px"  class="form-control"><span style="font-size: 14px; margin-right: 10px;">㎜ 이하</span>'	  
+					  html	+='	  	</td>'  
+					  html  +='		<td class="td-header t-left">등판능력</td>'
+					  html	+=' 	<td colspan="3">'
+					  html	+='			<input type="text" name="spec_climb_algle_min" style="width:80px"  class="form-control"><span style="font-size: 14px; margin-right: 10px;"> ° 이상 ~</span>'
+					  html	+='			<input type="text" name="spec_climb_algle_max" style="width:80px"  class="form-control"><span style="font-size: 14px; margin-right: 10px;"> ° 이하</span>'
+					  html	+='	  	</td>'    
+					  html  +=' </tr> '	*/
+					 							  	
+					return 	html;
+	    },
+	    
+	    viewHtml:function(spec){
+			 
+			 var html ='';
+
+			  	  html  +=' <tr class="createTag" > '
+				  html  +=' 	<th class="td-header">길이</th>' 
+				  html	+=' 	<td  class="t-left">' +spec.spec_length+'<span style="font-size:12px">㎜</span></td>'
+				  html  +=' 	<th class="td-header">너비</th>' 
+				  html	+=' 	<td  class="t-left">' +spec.spec_width+'<span style="font-size:12px">㎜</span></td>'
+				  html  +='	</tr> '
+				  
+				  html  +=' <tr class="createTag" > '
+				  html  +=' 	<th class="td-header">높이</th>' 
+				  html	+=' 	<td  class="t-left">' +spec.spec_height+'<span style="font-size:12px">㎜</span></td>'
+				  html  +=' 	<th class="td-header">자체중량</th>' 
+				  html	+=' 	<td  class="t-left">' +spec.spec_weight+'<span style="font-size:12px">㎏</span></td>'
+				  html  +='	</tr> '
+				  
+				/*  html  +=' <tr class="createTag" > '
+				  html  +=' 	<th class="td-header">최저지상고</th>' 
+				  html	+=' 	<td  class="t-left">' +spec.min_ground+'<span style="font-size:12px">㎜</span></td>'
+				  html  +=' 	<th class="td-header">등판능략</th>' 
+				  html	+=' 	<td  class="t-left">' +spec.spec_climb_algle+'<span style="font-size:12px">°</span></td>'
+				  html  +='	</tr> '*/
+					  
+				 							  	
+				return 	html;
+	    	},		  
+		 
+		 
+	 },		 
+	 checkBoxHtml:{
+		 RENTAL:function(){
+			 var html ='';
+			 html  +=' <label class="mt-checkbox mt-checkbox-outline">'
+			html  +='	<input type="checkbox" id="half_yn" name="half_yn" class="form-control" value="HAL">반나절 <span></span>'
+			html  +='</label> 	'
+			html  +='<label class="mt-checkbox mt-checkbox-outline">'
+			html  +='	<input type="checkbox" id="day_yn" name="day_yn" class="form-control" value="DAY" >일대 <span></span>'
+			html  +='</label> '
+			html  +='<label class="mt-checkbox mt-checkbox-outline">'
+			html  +='	<input type="checkbox" id="month_yn" name="month_yn" class="form-control" value="MON" >월대 <span></span>'
+			html  +='</label> '
+			html  +='<label class="mt-checkbox mt-checkbox-outline">'
+			html  +='	<input type="checkbox" id="nego_yn" name="nego_yn" class="form-control" value="NEG">협의 <span></span>'
+			html  +='</label>' 	
+			
+		return 	html;  
+			
+		 },
+		 
+		 EQUIPMENT:function(){
+			 var html ='';
+			 
+
+				html  +=' <label class="mt-checkbox mt-checkbox-outline">'
+				html  +='	<input type="checkbox" id="half_yn" name="half_yn" class="form-control" value="N" onclick="onRentelTypeChked(event)">반나절 <span></span>'
+				html  +='</label> 	'
+				html  +='<label class="mt-checkbox mt-checkbox-outline">'
+				html  +='	<input type="checkbox" id="day_yn" name="day_yn" class="form-control" value="Y" onclick="onRentelTypeChked(event)">일대 <span></span>'
+				html  +='</label> '
+				html  +='<label class="mt-checkbox mt-checkbox-outline">'
+				html  +='	<input type="checkbox" id="month_yn" name="month_yn" class="form-control" value="Y" onclick="onRentelTypeChked(event)">월대 <span></span>'
+				html  +='</label> '
+				html  +='<label class="mt-checkbox mt-checkbox-outline">'
+				html  +='	<input type="checkbox" id="nego_yn" name="nego_yn" class="form-control" value="Y">협의 <span></span>'
+				html  +='</label>' 	
+				  
+		    return 	html;  
+		 	},
+
+		 },	 
+	 hederHtml:{
+		 EQ001:function(){ //타워크레인
+	
+		  var html ='';
+		 /* var spec = _.isEmpty(data) ? equipmentSpec.defaultData : data 
+		  specSeq= equipmentSpec.specSeq ;*/
+				  html  +=' <table id="specTable" class="table table-bordered">'
+				  html  +=' 	<thead>'
+				  html  +=' 		<tr class="t-center">'
+				  html  +='				<th width="6%" rowspan="2" >형식</th>'
+				  html  +='				<th width="8%" rowspan="2" >연식</th>'
+				  html  +='				<th width="10%" >규격</th>'
+				  html  +='				<th width="10%"  colspan ="2">작업 반경(m)</th>'
+				  html  +='				<th width="10%" rowspan="2" >조종사 포함</th>'
+				  html  +='				<th width="8%" rowspan="2" >조종사 면혀</th>'
+				  html  +='				<th width="51%" colspan ="4">조종사 경력(년) </th>'
+				  html  +='				<th width="3%" rowspan="2" id="addBtn">'
+				  html  +='					<button type="button" class="btn dark" onclick="onAddEquipment()">'
+				  html  +='						<i class=""></i>추가'
+				  html  +='					</button>'
+				  html  +='				</th>'
+				  html  +='			</tr>'
+				  html  +='			<tr class="t-center">'
+				  html  +='			    <th width="5%">최대정격하중(ton)</th>'
+				  html  +='				<th width="5%">최대</th>'
+				  html  +='				<th width="5%">최소</th>'	
+				  html  +='				<th width="10%">L형일반</th>'
+				  html  +='				<th width="10%">L형소형</th>'
+				  html  +='				<th width="10%">T형일반</th>'
+				  html  +='				<th width="10%">T형소형</th>'
+				  html  +='			</tr>'
+				  html  +='		</thead>'
+				  html  +='		 <tbody id="bodySpec">'
+				  html  +='		</tbody>'
+				  html  +='	</table>'			  
+				  return html
+		 	},
+
+ 		},
+ 		inputHtmlRental:{
+ 			 EQ001:function(data){ //타워크레인
+ 				  var html ='';
+ 				  var spec = _.isEmpty(data) ? equipmentSpec.defaultData : data 
+ 		
+ 				  specSeq= equipmentSpec.specSeq ;
+ 				  html  +=' <tr class="t-center" id ="specLine'+specSeq+'" name="specLine'+specSeq+'">'
+ 				  html  +='	  <td class="t-left" >'
+ 				  html  +='		<input name="equipment_seq'+specSeq+'" type="hidden">'
+ 			      html  +='		<input id="row_status'+specSeq+'" name="row_status'+specSeq+'" type="hidden">'
+ 				  html  +=' 	<div class="form-inline">'
+ 				  html  +=' 		<div class="input-group">'
+ 				  html  +=' 			<select id="equipment_cd"   name="spec_standard'+specSeq+'" class="form-control" style="width:80px">'
+ 				  html  +='                 <option value = "L" ' + (spec.spec_standard =="L" ? "selected":"") + '>L형</option>'
+ 				  html  +='         		<option value = "T" ' + (spec.spec_standard =="T" ? "selected":"") + '>T형</option>'
+ 				  html  +='       		</select>'
+ 				  html  +='   		</div>'
+ 				  html  +=' 	</div>'
+ 				  html  +='  </td>'
+ 				  html  +='	 <td>'
+ 				  html  +=' 	<div  style="width:110px" class="form-inline">'
+ 				  html  +=' 		<div class="input-group">'
+ 				  html  +=' 			<select id="prod_yyyy'+specSeq+'"  name="prod_yyyy'+specSeq+'"  class="form-control" style="width:80px">'
+ 				  html  +=               equipmentSpec.yearOption
+ 				  html  +='       		</select>'
+ 				  html  +='   		<span style="font-size:12px;margin-left: 5px;">이후</span></div>'
+ 				  html  +=' 	</div>'
+ 				  html  +='  </td>'
+ 				  html  +='	 <td>'
+ 				  html  +=' 	 <input type="text" style="width:100px" name="spec001'+specSeq+'"class="form-control"  oninput ="equipmentSpec.onNumberCheck(this)"  value='+spec.spec001+'>'
+ 				  html  +='  </td>'	
+ 				  html  +='	 <td>'
+ 				  html	+='	     <input type="text" name="spec002'+specSeq+'" style="width:80px"  class="form-control"  oninput ="equipmentSpec.onNumberCheck(this)"  value='+spec.spec002+'>' 	 
+ 				  html  +='  </td>'
+				  html  +='	 <td>'
+	 			  html  +=' 	 <input type="text" name="spec003'+specSeq+'" style="width:80px"  class="form-control" oninput ="equipmentSpec.onNumberCheck(this)"  value='+spec.spec003+'>'
+				  html  +='  </td>'	  
+ 				  html  +='	 <td>'
+ 				  html  +=' 	<div class="form-inline">'
+ 				  html  +=' 		<div class="input-group">'
+ 				  html  +=' 			<select id="pilot_yn"   name="pilot_yn'+specSeq+'" class="form-control" style="width:80px"   onchange ="equipmentSpec.onChangePilotYn( this,\''+specSeq+'\')" >'
+ 				  html  +='                 <option value = "Y" ' + (spec.pilot_yn =="Y" ? "selected":"") + ' >포함</option>'
+ 				  html  +='         		<option value = "N" ' + (spec.pilot_yn =="N" ? "selected":"") + ' >미포함</option>'
+ 				  html  +='       		</select>'
+ 				  html  +='   		</div>'
+ 				  html  +=' 	</div>'
+ 				  html  +='  </td>'	
+ 				  html  +='	 <td>'
+ 				  html  +=' 	<div class="form-inline">'
+ 				  html  +=' 		<div class="input-group">'
+ 				  html  +=' 			<select id="pilot_license"   name="pilot_license'+specSeq+'" class="form-control" style="width:80px" ' + (spec.pilot_yn =="N" ? "disabled":"") + ' >'
+ 				  if(spec.pilot_yn == "N"){
+ 					  html  +=' 	        <option value = "" ></option>'
+ 				  }
+ 				  html  +='                 <option value = "NM" ' + (spec.pilot_license =="NM" ? "selected":"") + ' >소형</option>'
+ 				  html  +='         		<option value = "SM" ' + (spec.pilot_license =="SM" ? "selected":"") + ' >일반</option>'
+ 				  html  +='       		</select>'
+ 				  html  +='   		</div>'
+ 				  html  +=' 	</div>'
+ 				  html  +='  </td>'	
+ 				  html  +='	 <td>'
+ 				  html	+='		<input type="text" name="career_lnm_year'+specSeq+'"  style="width:50px"  class="form-control" ' + (spec.pilot_yn =="N" ? "readonly":"") + ' value='+spec.career_lnm_year+'>' 
+ 				  html  +='  </td>'	 
+ 				  html  +='	 <td>'
+ 				  html	+='		<input type="text" name="career_lrm_year'+specSeq+'"  style="width:50px"  class="form-control" ' + (spec.pilot_yn =="N" ? "readonly":"") + ' value='+spec.career_lrm_year+'>' 
+ 				  html  +='  </td>'	 
+ 				  html  +='	 <td>'
+ 				  html	+='		<input type="text" name="career_tnm_year'+specSeq+'"  style="width:50px"  class="form-control" ' + (spec.pilot_yn =="N" ? "readonly":"") + ' value='+spec.career_tnm_year+'>' 
+ 				  html  +='  </td>'	 
+ 				  html  +='	 <td>'
+ 				  html	+='		<input type="text" name="career_trm_year'+specSeq+'"  style="width:50px"  class="form-control" ' + (spec.pilot_yn =="N" ? "readonly":"") + ' value='+spec.career_trm_year+'>' 
+ 				  html  +='  </td>'
+ 				  html  +='	 <td>'
+ 				  html  +='	 	<button type="button" class="btn red" name="specLine'+specSeq+' "onclick = "onDeleteHide(this,\''+specSeq+'\')" > <i class=""></i>삭제</button>'
+ 				  html  +='  </td>'	  
+ 				  html  +='	</tr>'	
+ 					  
+ 			 return html
+
+ 		 	},
+ 		 },	
+	 inputHtml:{
+		 EQ001:function(data){ //타워크레인
+			  var html ='';
+			  var spec = _.isEmpty(data) ? equipmentSpec.defaultData : data 
+			   specSeq= equipmentSpec.specSeq ;
+				  html  +=' <tr class="createTag"> <th class="td-header" >형식 </th>' 
+				  html	+=' <td  class="t-left" > <label class="mt-checkbox mt-checkbox-outline">'
+				  html	+='	<input type="radio" name="spec_standard"  class="form-control" value="L" '+ (spec.spec_standard =="L" ? "checked":"") +'>L형 <span></span>'
+				  html	+='	</label> '
+				  html	+=' <label class="mt-checkbox mt-checkbox-outline">'
+				  html	+='	<input type="radio" name="spec_standard"  class="form-control" value="T" '+ (spec.spec_standard =="T" ? "checked":"") +'>T형 <span></span>'
+				  html	+='	</label> '		  
+				  html  +=' </td> '
+				  html	+=' <th class="td-header">연식</th>' 
+				  html	+='	<td  class="t-left" ><select id="prod_yyyy" name="prod_yyyy" class="bs-select form-control" style="width:70%;">'+equipmentSpec.yearOption+'</select>'  
+				  html  +=' </td><tr>'
+				  html  +=' <tr class="createTag" > <th class="td-header"> 규격 (최대 정격하중)</th>' 
+				  html	+=' <td  class="t-left">' 
+				  html	+='	<input type="text" name="spec001" style="width:200px"  class="form-control"   oninput ="equipmentSpec.onNumberCheck(this)" value="'+spec.spec001+'" ><span style="font-size:12px">ton</span> </td>' 
+				  html  +=' <th class="td-header">작업반경</th>' 
+				  html	+=' <td  class="t-left">' 
+				  html	+='	<span style="font-size:12px">최대:</span> <input type="text" name="spec002" style="width:100px"  oninput ="equipmentSpec.onNumberCheck(this)"  class="form-control" value='+spec.spec002+'><span style="font-size:12px"> m</span>'
+				  html	+='	<span style="font-size:12px">최소:</span> <input type="text" name="spec003" style="width:100px"  oninput ="equipmentSpec.onNumberCheck(this)"  class="form-control" value='+spec.spec003+'><span style="font-size:12px"> m</span>' 	  
+				  html  +=' </td></tr> '
+				  html  +=' <tr class="createTag"> <th class="td-header">조종사 포함 여부 </th>' 
+				  html	+=' <td  class="t-left"> <label class="mt-checkbox mt-checkbox-outline">'
+				  html	+='	<input type="radio" name="pilot_yn"  class="form-control" onclick ="equipmentSpec.onChangePilotYn( this,\'\')" value="Y" '+ (spec.pilot_yn =="Y" ? "checked":"") +'>포함 <span></span>'
+				  html	+='	</label> '
+				  html	+=' <label class="mt-checkbox mt-checkbox-outline">'
+				  html	+='	<input type="radio" name="pilot_yn"  class="form-control" onclick ="equipmentSpec.onChangePilotYn( this,\'\')" value="N"'+ (spec.pilot_yn =="N" ? "checked":"") +'>미포함 <span></span>'
+				  html	+='	</label> '		  
+				  html  +=' </td> '	  
+				  html  +=' <th class="td-header">조종사 면혀종류 </th>'
+				  html	+=' <td  class="t-left"> <label class="mt-checkbox mt-checkbox-outline">'
+				  html	+='	<input type="radio" name="pilot_license"  class="form-control" value="SM" '+ (spec.pilot_license =="SM" ? "checked":"") +'>소형 <span></span>'
+				  html	+='	</label> '
+				  html	+=' <label class="mt-checkbox mt-checkbox-outline">'
+				  html	+='	<input type="radio" name="pilot_license"  class="form-control" value="NM" '+ (spec.pilot_license =="NM" ? "checked":"") +'>일반 <span></span>'
+				  html	+='	</label> '		  
+				  html  +=' </td></tr> '
+				  
+				  html  +=' <tr class="createTag"> <th class="td-header">조종사 경력사항</th>' 
+				  html	+=' <td colspan ="3"  class="t-left">'
+				  html	+=' <span style="font-size:12px">L형일반:</span> '
+				  html	+='	<input type="text" name="career_lnm_year" style="width:50px"  class="form-control"  value='+spec.career_lnm_year+'><span style="font-size:12px;margin-right: 10px;"> 년</span>' 
+				  html	+=' <span style="font-size:12px">L형소형:</span> '
+				  html	+='	<input type="text" name="career_lrm_year" style="width:50px"  class="form-control"  value='+spec.career_lrm_year+'> <span style="font-size:12px;margin-right: 10px;"> 년</span>' 
+				  html	+=' <span style="font-size:12px">T형일반:</span> '
+				  html	+='	<input type="text" name="career_tnm_year" style="width:50px"  class="form-control"  value='+spec.career_tnm_year+'> <span style="font-size:12px;margin-right: 10px;"> 년</span>'
+				  html	+=' <span style="font-size:12px">T형소형:</span> '
+				  html	+='	<input type="text" name="career_trm_year" style="width:50px"  class="form-control"  value='+spec.career_trm_year+'>  <span style="font-size:12px;margin-right: 10px;"> 년</span>'
+				  html  +=' </td></tr> ' 
+		 return html
+
+	 	},
+		
+	 },
+	 
+	 
+	 searchHtml:{
+		EQ001:function(){ //타워크레인
+			
+			  var html ='';
+			  html  +=' <tr class="createTag"> <td class="td-header t-left" >형식 </td>' 
+			  html	+=' <td> <label class="mt-checkbox mt-checkbox-outline">'
+			  html	+='	<input type="radio" name="spec_standard"  class="form-control" value="L">L형 <span></span>'
+			  html	+='	</label> '
+			  html	+=' <label class="mt-checkbox mt-checkbox-outline">'
+			  html	+='	<input type="radio" name="spec_standard"  class="form-control" value="T">T형 <span></span>'
+			  html	+='	</label> '		  
+			  html  +=' </td> '
+			  html	+=' <td class="td-header t-left">연식</td>' 
+			  html	+='	<td  class="t-left" ><select  name="prod_yyyy" class="bs-select form-control" style="width:70%;">'+equipmentSpec.yearOption+'</select>' 
+			  html  +=' </td><tr>'
+			  html  +=' <tr class="createTag" > <td class="td-header t-left"> 규격 (최대 정격하중)</td>' 
+			  html	+=' <td>' 
+			  html	+='		<input type="text" name="spec001_min" style="width:80px"  class="form-control"><span style="font-size: 14px; margin-right: 10px;"> ton 이상 ~</span>'
+			  html	+='		<input type="text" name="spec001_max" style="width:80px"  class="form-control"><span style="font-size: 14px; margin-right: 10px;"> ton 이하</span>'
+			  html	+='	</td>' 
+			  html  +=' <td class="td-header t-left">작업반경</td>' 
+			  html	+=' <td>' 
+			  html	+='	<span style="font-size:12px">최대:</span> <input type="text" name="spec002_min" style="width:100px"  class="form-control"><span style="font-size: 14px; margin-right: 10px;"> m</span>'
+			  html	+='	<span style="font-size:12px">최소:</span> <input type="text" name="spec003_max" style="width:100px"  class="form-control"><span style="font-size: 14px; margin-right: 10px;"> m</span>' 	  
+			  html  +=' </td></tr> '
+				       	 
+		          html  +=' <tr class="createTag"> <td class="td-header t-left">조종사 포함 여부 </td>' 
+			  html	+=' <td> <label class="mt-checkbox mt-checkbox-outline">'
+			  html	+='	<input type="radio" name="pilot_yn"  class="form-control" value="Y">포함 <span></span>'
+			  html	+='	</label> '
+			  html	+=' <label class="mt-checkbox mt-checkbox-outline">'
+			  html	+='	<input type="radio" name="pilot_yn"  class="form-control" value="N">미포함 <span></span>'
+			  html	+='	</label> '		  
+			  html  +=' </td> '	  
+			  html  +=' <td class="td-header t-left">조종사 면혀종류 </td>'
+			  html	+=' <td> <label class="mt-checkbox mt-checkbox-outline">'
+			  html	+='	<input type="radio" name="pilot_license"  class="form-control" value="SM">소형 <span></span>'
+			  html	+='	</label> '
+			  html	+=' <label class="mt-checkbox mt-checkbox-outline">'
+			  html	+='	<input type="radio" name="pilot_license"  class="form-control" value="NM">일반 <span></span>'
+			  html	+='	</label> '		  
+			  html  +=' </td></tr> '
+			  
+			  html  +=' <tr class="createTag"> <td class="td-header t-left">조종사 경력사항</td>' 
+			  html	+=' <td colspan ="3">'
+			  html  +='		 <label  style="font-size: 14px; margin-right: 5px;">L형 일반:</label>'   
+			  html  +='		 <input name="career_lnm_year_min" style="width:5%;margin-right: 3px; float: none;" class="form-control" >' 
+			  html  +='		 <label style="font-size: 14px; margin-right: 5px;">년 ~</label>' 
+			  html  +='		 <input name="career_lnm_year_max" style="width:5%;margin-right: 3px; float: none;" class="form-control" >' 
+			  html  +='		 <label  style="font-size: 14px; margin-right: 10px;">년 </label>' 
+			  
+			  html  +='		 <label style="font-size: 14px; margin-right: 5px;">L형 소형:</label>'   
+			  html  +='		 <input name="career_lrm_year_min" style="width:5%;margin-right: 3px; float: none;" class="form-control" >' 
+			  html  +='		 <labelstyle="font-size: 14px; margin-right: 5px;">년 ~</label>' 
+			  html  +='		 <input name="career_lrm_year_max" style="width:5%;margin-right: 3px; float: none;" class="form-control" >' 
+			  html  +='		 <label style="font-size: 14px; margin-right: 10px;">년 </label>' 
+			  
+			  html  +='		 <label  style="font-size: 14px; margin-right: 5px;">T형 일반:</label>'   
+			  html  +='		 <input name="career_tnm_year_min" style="width:5%;margin-right: 3px; float: none;" class="form-control" >' 
+			  html  +='		 <label style="font-size: 14px; margin-right: 5px;">년 ~</label>' 
+			  html  +='		 <input name="career_tnm_year_max" style="width:5%;margin-right: 3px; float: none;" class="form-control" >' 
+			  html  +='		 <label  style="font-size: 14px; margin-right: 10px;">년 </label>' 
+			  
+			  html  +='		 <label style="font-size: 14px; margin-right: 5px;">T형 소형:</label>'   
+			  html  +='		 <input name="career_trm_year_min" style="width:5%;margin-right: 3px; float: none;" class="form-control" >' 
+			  html  +='		 <labelstyle="font-size: 14px; margin-right: 5px;">년 ~</label>' 
+			  html  +='		 <input name="career_trm_year_max" style="width:5%;margin-right: 3px; float: none;" class="form-control" >' 
+			  html  +='		 <label  style="font-size: 14px; margin-right: 10px;">년 </label>' 
+			  html  +=' </td></tr> ' 
+			 return html
+	 	},
+	 
+	},
+	 viewRentalHtml:{
+			EQ001:function(data){ //타워크레인
+					  console.log("viewRentalHtml",data);
+					  var html ='';
+					  var spec = _.isEmpty(data) ? equipmentSpec.defaultData : data 
+							  html  +=' <tr class="t-center" >'
+					  html  +='	  <td>'
+					  html  +=   	spec.spec_standard +'형' 
+					  html  +='  </td>'
+					  html  +='	 <td>'
+					  html  += 	   spec.prod_yyyy +'년 이후' 
+					  html  +='  </td>'
+					  html  +='	 <td>'
+					  html  +=     spec.spec001
+					  html  +='  </td>'	
+					  html  +='	 <td>'
+					  html	+=     	spec.spec002	 
+					  html  +='  </td>'
+					  html  +='	 <td>'
+					  html  +=      spec.spec003
+					  html  +='  </td>'	  
+					  html  +='	 <td>'
+					  
+					  html  +=    ( spec.pilot_yn =="Y" ? "포함":"미포함") 
+					  html  +='  </td>'	
+					  html  +='	 <td>'
+					  if(spec.pilot_yn =="Y" ){
+					  html += (spec.pilot_license =="NM" ? "일반":"소형") 
+					  }else{
+						  html += "미포함"   	 
+					  }
+					  
+					  html  +='  </td>'	
+					  html  +='	 <td>'
+					  html	+=     spec.career_lnm_year +   (  spec.career_lnm_year =="" ? "미포함":"년") 
+					  html  +='  </td>'	 
+					  html  +='	 <td>'
+					  html	+=    spec.career_lrm_year + (  spec.career_lrm_year =="" ? "미포함":"년")  
+					  html  +='  </td>'	 
+					  html  +='	 <td>'
+					  html	+=   	spec.career_tnm_year + (  spec.career_tnm_year =="" ? "미포함":"년") 
+					  html  +='  </td>'	 
+					  html  +='	 <td>'
+					  html	+=    spec.career_trm_year  + (  spec.career_trm_year =="" ? "미포함":"년") 
+					  html  +='  </td>'
+					  html  +='	 <td id="delBtn">'
+					  html  +='  </td>'	  
+					  html  +='	</tr>'	
+						 return html
+				},
+			},	
+	 viewHtml:{
+			EQ001:function(data){ //타워크레인
+				
+				  var html ='';
+				  var spec = _.isEmpty(data) ? equipmentSpec.defaultData : data 
+				  html  +=' <tr class="createTag"> <th class="td-header" >형식 </th>' 
+				  html	+=' <td  class="t-left" >'+ spec.spec_standard +'</td>'
+				  html	+=' <th class="td-header">연식</th>' 
+				  html	+='	<td  class="t-left" >'+spec.prod_yyyy+'년 이후</td><tr>'    
+				  html  +=' <tr class="createTag" > <th class="td-header"> 규격 (최대 정격하중)</th>' 
+				  html	+=' <td  class="t-left">'+ spec.spec001+ '<span style="font-size:12px">ton</span> </td>' 
+				  html  +=' <th class="td-header">작업반경</th>' 
+				  html	+=' <td  class="t-left">' 
+				  html	+='	<span style="font-size:12px">최대:</span>'+spec.spec002+'<span style="font-size:12px">m</span>'
+				  html	+='	<span style="font-size:12px">최소:</span>'+spec.spec003+'<span style="font-size:12px">m</span>' 	  
+				  html  +=' </td></tr> '
+			      html  +=' <tr class="createTag"> <th class="td-header">조종사 포함 여부 </th>' 
+				  html	+=' <td  class="t-left">'+spec.pilot_yn+'</td> '	  
+				  html  +=' <th class="td-header">조종사 면혀종류 </th>'
+				  html	+=' <td  class="t-left">'+ (spec.pilot_license =="NM" ? "일반":"소형") +'</td></tr> '
+				  html  +=' <tr class="createTag"> <th class="td-header">조종사 경력사항</th>' 
+				  html	+=' <td colspan ="3"  class="t-left"> L형 일반 :'+spec.career_lnm_year+' 년'
+				  html	+='	L형 소형 :'+spec.career_lrm_year+' 년'
+				  html	+='	T형 일반 :'+spec.career_tnm_year+' 년'
+				  html	+='	T형 소형 :'+spec.career_trm_year+' 년'
+				  html  +=' </td></tr> ' 
+				 return html
+		 	},
+		},
+}
+
+
+

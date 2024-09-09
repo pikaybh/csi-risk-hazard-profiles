@@ -1,0 +1,1069 @@
+
+// 달력 팝업
+function Calendar_P(obj) {
+	ReturnValue = window.window.showModalDialog("/com/calendar/calendarFrame.jsp", obj.value,
+          										"dialogWidth:280px; dialogHeight:330px; edge:sunken; center:yes; resizable:no; status:no; help:no; scroll:no;");
+    obj.value = ReturnValue == null || ReturnValue == 'undefined' ? '' : ReturnValue;
+    Calendar_Post();
+}
+
+// 우편번호 찾기
+function find_zip_no(params, version) {
+	wdt = 540; hgt = 600;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	if(version == 'old') {
+		window.open("/com/other.do?method=zipFinder"+params, "zipFind", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+	}else {
+		window.open("/com/redirect.do?reqUrl=com/popup/jusoLink"+params, "zipFind", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left=" + xPos + ",top=" + yPos);
+	}
+}
+
+// 주소찾기 (지번, 도로명주소)
+function find_juso(addr, category, opt, mastAddr) {
+	/*
+		결과 선택 값의 Return은 find_juso_callback(data, opt) 으로 됨
+		 - data의 구조
+			"id": "주소ID",
+			"address": {
+				"zipcode": "우편번호",
+				"category": "parcel", // parcel : 지번주소, road : 도로명주소
+				"road": "도로명주소",
+				"parcel": "지번주소",
+				"sido": "시도",
+				"gugun": "시도",
+				"dong": "시도",
+				"detail": "시도"
+			},
+			"point": {
+				"x": "127.480785325014",
+				"y": "36.116186321055"
+			}
+	*/
+
+	wdt = 604; hgt = 606;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	var params = "";
+	params += (addr != null) ? "&query=" + encodeURIComponent(addr) : "";
+	params += (category != null) ? "&category=" + category : "";
+	params += (opt != null) ? "&opt=" + opt : "";
+	params += (mastAddr != null) ? "&mast_addr=" + mastAddr : "";
+	window.open("/com/vworldJusoPop.do?wdt=" + wdt + params, "jusoList", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,status=no,scrollbars=yes,resizable=yes,left=" + xPos + ",top=" + yPos);
+
+	//find_juso_callback
+}
+
+//주소찾기 (도로명주소)
+function find_juso_road(addr, category, opt) {
+	wdt = 604; hgt = 606;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	var params = "";
+	params += (addr != null) ? "&query=" + encodeURIComponent(addr) : "";
+	params += (category != null) ? "&category=" + category : "";
+	params += (opt != null) ? "&opt=" + opt : "";
+	window.open("/com/vworldJusoRoadPop.do?wdt=" + wdt + params, "jusoList", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left=" + xPos + ",top=" + yPos);
+}
+
+function open_map(accd_no) {
+	wdt = 604;
+	hgt = 606;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	var params = "";
+	params += (accd_no != null) ? "&accd_no=" + accd_no : "";
+	window.open("/acd/mapPop.do?wdt=" + wdt + params, "openMap", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,status=no,scrollbars=yes,resizable=yes,left=" + xPos + ",top=" + yPos);
+
+	//find_juso_callback
+}
+
+// 공사대장 찾기
+function find_cws(params) {
+	wdt = 1024; hgt = 700;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	//window.open("/com/cwsSearchPop.do?"+params, "orgnList", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+	
+	if(params == ''){
+		windowOpenPost("/com/cwsSearchPop.do", "orgnList", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+	}else {
+		windowOpenPost("/com/cwsSearchPop.do?"+params, "orgnList", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+	}
+}
+
+// 공사대장 찾기
+function find_cws_get(params) {
+	wdt = 1024; hgt = 700;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	//window.open("/com/cwsSearchPop.do?"+params, "orgnList", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+
+	if(params == ''){
+		window.open("/com/cwsSearchPop.do", "orgnList", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+	}else {
+		window.open("/com/cwsSearchPop.do?"+params, "orgnList", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+	}
+}
+
+
+// 공사대장 찾기
+function find_eais(params) {
+	wdt = 1024; hgt = 700;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	//window.open("/com/cwsSearchPop.do?"+params, "orgnList", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+	
+	if(params == ''){
+		windowOpenPost("/smp/eaisSearchPop.do", "orgnList", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+	}else {
+		windowOpenPost("/smp/eaisSearchPop.do?"+params, "orgnList", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+	}
+}
+
+//공사대장 찾기
+function find_blcm(params) {
+	wdt = 1024; hgt = 700;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	//window.open("/com/cwsSearchPop.do?"+params, "orgnList", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+	
+	if(params == ''){
+		windowOpenPost("/smp/blcmSearchPop.do", "orgnList", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+	}else {
+		windowOpenPost("/smp/blcmSearchPop.do?"+params, "orgnList", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+	}
+}
+
+// 공사대장 찾기
+function find_eais_get(params) {
+	wdt = 1024; hgt = 700;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	//window.open("/com/cwsSearchPop.do?"+params, "orgnList", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+
+	if(params == ''){
+		window.open("/smp/eaisSearchPop.do", "orgnList", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+	}else {
+		window.open("/smp/eaisSearchPop.do?"+params, "orgnList", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+	}
+}
+
+//안전진단전문기관 찾기
+function find_fmsInst(params) {
+	wdt = 1024; hgt = 700;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	//window.open("/com/cwsSearchPop.do?"+params, "orgnList", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+	
+	if(params == ''){
+		windowOpenPost("/smp/fmsInstSearchPop.do", "fmsInstSearch", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+	}else {
+		windowOpenPost("/smp/fmsInstSearchPop.do?"+params, "fmsInstSearch", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+	}
+}
+
+//건설 교차로 지역 
+function find_croAddr() {
+	wdt = 1024; hgt = 700;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/cro/regionSelectPop.do", "croaddr", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+}
+
+
+/*post방식으로 윈도우 창 생성*/
+function windowOpenPost(url, name, option){
+	var urlArr = url.split('?');
+	post_win(name, urlArr[0],urlArr[1]||'' , option);
+}
+
+function post_win(name, url, parm, opt) {
+	var temp_win = window.open('', name, opt);
+	post_goto(url, parm, name);
+}
+
+function post_goto(url, parm, target) {
+	var f = document.createElement('form');
+
+	var objs, value;
+	if(parm != "") {
+		var params = parm.split("&");
+		for(var i=0;i<params.length;i++){
+			//console.log('params[i] = '+params[i]);
+			if(params[i] != "") {
+				var param = params[i].split("=");
+				objs = document.createElement('input');
+				objs.setAttribute('type', 'hidden');
+				objs.setAttribute('name', param[0]);
+				objs.setAttribute('value', param[1]);
+				f.appendChild(objs);			
+			}
+		}		
+	}
+
+	if (target)
+		f.setAttribute('target', target);
+
+	f.setAttribute('method', 'post');
+	f.setAttribute('action', url);
+	document.body.appendChild(f);
+	f.submit();
+}
+
+// 설계안전성검토 결과 찾기
+function find_dfs(params) {
+	wdt = 1024; hgt = 700;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/com/dfsSearchPop.do?" + params, "orgnList", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left=" + xPos + ",top=" + yPos);
+}
+
+// 파일첨부
+function go_attach_file(pathKey, subDir, ref_table, ref_pk, params) {
+	wdt = 500; hgt = 400;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	var theURL = '/com/other.do?method=fileAttachPop&pathKey='+pathKey+'.pds.dir&subDir='+subDir+'&ref_table='+ref_table+'&ref_pk='+ref_pk+params;
+	window.open(theURL, "fileAttach", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left=" + xPos + ",top=" + yPos);
+}
+
+//CSI : 파일 다운로드
+function file_download(downForm, file_no) {
+	downForm.file_no.value = file_no;
+	downForm.action = '/com/fileDownloadProc.do';
+	downForm.target = '_self';
+	downForm.submit();
+}
+
+//CSI : 파일 다운로드(디코딩이 필요없는 file_no)
+function file_downloadByNo(downForm, file_no) {
+	downForm.file_no.value = file_no;
+	downForm.action = '/com/fileDownloadByNoProc.do';
+	downForm.target = '_self';
+	downForm.submit();
+}
+
+//SANJE 파일 다운로드
+function sanje_file_download(downForm, reg_no) {
+	downForm.reg_no.value = reg_no;
+	downForm.action = '/com/sanjeFileDownloadProc.do';
+	downForm.target = '_self';
+	downForm.submit();
+}
+
+//수준평가 평가항목 템플릿 다운로드
+function lev_file_download(downForm, sfile_nm, file_nm) {
+	if(file_nm == undefined) { file_nm = sfile_nm.substring(sfile_nm.lastIndexOf('_')+1); }
+	downForm.sfile_nm.value = sfile_nm;
+	downForm.file_nm.value = file_nm;
+	downForm.action = '/com/levFileDownloadProc.do';
+	downForm.submit();
+}
+
+/*사이냅문서뷰어 미리보기*/
+function fn_preview(downForm, file_no){
+	var openWindow = window.open('about:blank', file_no);
+	downForm.file_no.value = file_no;
+	downForm.action = '/com/previewProc.do';
+	downForm.target = file_no;
+	downForm.submit();
+}
+
+/*사이냅문서뷰어 미리보기(디코딩이 필요없는 file_no)*/
+function fn_previewByNo(downForm, file_no){
+	var openWindow = window.open('about:blank', file_no);
+	downForm.file_no.value = file_no;
+	downForm.action = '/com/previewByNoProc.do';
+	downForm.target = file_no;
+	downForm.submit();
+}
+
+// 비밀번호 변경
+function go_change_pswd(user_id)	{
+	var pagrUrl = "/com/other.do?method=pswdChange&user_id="+user_id;
+	window.open(pagrUrl,'pswdChange','width=500,height=235,left=300,top=150');
+}
+
+// 아이디/비밀번호 찾기
+function find_id_pw() {
+	wdt = 500; hgt = 375;
+   	xPos = Math.ceil((screen.width - wdt) / 2);
+    yPos = Math.ceil((screen.height- hgt) / 2);
+	window.open("/com/other.do?method=idPwFinder","idPwFinder","width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+// 기관찾기
+function find_orgn_code(params) {
+	wdt = 1000; hgt = 850;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/com/orgnSearch_Pop.do?"+params, "orgnList", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+// 사용자찾기
+function find_user_info(params) {
+	wdt = 800; hgt = 700;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/com/userSearch_Pop.do?"+params, "userList", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+// 기관찾기(사고)
+function find_accd_orgn_code(params) {
+	wdt = 1000; hgt = 850;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/acd/orgnAccdSearch_Pop.do?" + params, "orgnList", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,status=no,scrollbars=yes,resizable=yes,left=" + xPos + ",top=" + yPos);
+}
+
+// 기관찾기(현장)
+function find_spt_orgn_code(params) {
+	wdt = 1000; hgt = 850;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/spt/orgnSearch_Pop.do?" + params, "orgnList", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left=" + xPos + ",top=" + yPos);
+}
+
+//기관찾기(현장점검 대상)
+function find_spt_slctn_orgn_code(params) {
+	wdt = 1000; hgt = 850;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/spt/slctnOrgnSearch_Pop.do?"+params, "orgnList", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+//기관찾기(안전관리계획서, 현장점검-민간발주자)
+function find_smp_orgn_code(params) {
+	wdt = 1000; hgt = 850;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/smp/orgnSearch_Pop.do?"+params, "orgnList", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+// 사용자찾기(안전관리계획서, 현장점검-민간발주자)
+function find_smp_user_info(params) {
+	wdt = 800; hgt = 700;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/smp/userSearch_Pop.do?"+params, "userList", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+// 사용자찾기(사고)
+function find_accd_user_info(params) {
+	wdt = 800; hgt = 700;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/acd/userAccdSearch_Pop.do?"+params, "userList", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,status=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+// 사용자찾기(현장)
+function find_spt_user_info(params) {
+	wdt = 800; hgt = 700;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/spt/userSearch_Pop.do?"+params, "userList", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+// 사용자찾기(API)
+function find_api_user_info(params) {
+	wdt = 800; hgt = 700;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/adm/api/serviceKey/userApiSearch_Pop.do?"+params, "userList", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+//사용자찾기(안전관리계획서 검토담당자)
+function find_smp_chrgr_info(params) {
+	wdt = 800; hgt = 600;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/smp/userSmpChrgrSearch_Pop.do?"+params, "userList", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+// 발주청 수정
+function edit_ord_pop(params) {
+	wdt = 800; hgt = 700;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/acd/editOrdPop.do?"+params, "userList", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+// 사고발생현황 찾기
+function find_acd_sago(biz_id) {
+	wdt = 800; hgt = 600;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/com/other.do?method=acdSagoSearch&biz_id="+biz_id, "acdSagoSearch", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+//위험요소프로파일 코드 찾기
+function find_hra_profile(biz_id, pageType) {
+	wdt = 600; hgt = 780;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/com/hraProfilePop.do?biz_id="+biz_id+"&pageType="+pageType+"&wdt="+wdt, "hraProfile", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+// 위험요소프로파일 코드 선택
+function find_hra_search(biz_id, pageType) {
+	wdt = 604; hgt = 606;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/com/hraSearchPop.do?biz_id="+biz_id+"&pageType="+pageType+"&wdt="+wdt, "hraProfile", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+// 사고사례보고서
+function go_acd_report(biz_id, sago_no) {
+	wdt = 840; hgt = 750;
+   	xPos = Math.ceil((screen.width - wdt) / 2);
+    yPos = Math.ceil((screen.height- hgt) / 2) - 50;
+    var pageUrl = '';
+    if(biz_id == 'acd21001') {
+    	pageUrl = '/accident/acd10.do?method=acd01002_select';
+    }else if(biz_id == 'acd41001') {
+    	pageUrl = '/accident/acd10.do?method=acd41001_list';
+    }
+    pageUrl += '&sago_no='+sago_no + '&biz_id='+biz_id + '&popup_yn=Y';
+	window.open(pageUrl, 'acdMainPop', "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,status=yes,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+// 안전관리계획서 검토내역
+function go_smp_report(app_no, pro_status) {
+	wdt = 840; hgt = 750;
+   	xPos = Math.ceil((screen.width - wdt) / 2);
+    yPos = Math.ceil((screen.height- hgt) / 2) - 50;
+    var pageUrl = '';
+    if(pro_status < '3000') {
+    	pageUrl = '/safeplan/smp10.do?method=appMain&biz_id=apply';
+    }else if(pro_status == '3000') {
+    	pageUrl = '/safeplan/smp10.do?method=rcvMain&tab_index=1&biz_id=recv';
+    }else {
+    	pageUrl = '/safeplan/smp10.do?method=chkMain&tab_index=1&biz_id=check';
+    }
+    pageUrl += '&app_no='+app_no + '&popup_yn=Y';
+	window.open(pageUrl, 'smpMainPop', "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,status=yes,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+//안전관리계획서 검토결과 제출내역
+function go_smpc_report3(submit_no, master_no, biz_id) {
+	wdt = 960; hgt = 750;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height- hgt) / 2) - 50;
+
+	var pageUrl = '/smp/smpcSubmitMainPop.do?' + 'submit_no='+submit_no + '&master_no='+master_no + '&biz_id='+biz_id;;
+
+	window.open(pageUrl, 'smpMainPop', "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,status=yes,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+//안전관리계획서 검토결과 제출내역
+function go_smp_report2(submit_no, master_no) {
+	wdt = 840; hgt = 750;
+   	xPos = Math.ceil((screen.width - wdt) / 2);
+    yPos = Math.ceil((screen.height- hgt) / 2) - 50;
+        
+    var pageUrl = '/smp/smpSubmitMainPop.do?' + 'submit_no='+submit_no + '&master_no='+master_no;
+    
+    window.open(pageUrl, 'smpMainPop', "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,status=yes,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+//안전관리계획서 검토결과 제출내역
+function go_smpc_report(submit_no, master_no) {
+	wdt = 1280; hgt = 840;
+   	xPos = Math.ceil((screen.width - wdt) / 2);
+    yPos = Math.ceil((screen.height- hgt) / 2) - 50;
+        
+    var pageUrl = '/smp/smpcSubmitMainPop.do?' + 'submit_no='+submit_no + '&master_no='+master_no;
+    
+    window.open(pageUrl, 'smpcMainPop', "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,status=yes,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+//안전관리계획서 검토결과 제출내역
+function fnSptReportView(formId, report_id, report_head, params, save_yn) {
+	wdt = 1024; hgt = 800;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height- hgt) / 2) - 50;
+	var pageUrl = '/spt/sptReportPop.do?report_id=' + report_id +"&report_head="+encodeURIComponent(report_head)+ "&params="+encodeURIComponent(params);
+
+	if (save_yn) {
+		pageUrl = pageUrl + "&save_yn="+encodeURIComponent(save_yn);
+	}
+
+	window.open(pageUrl, 'sptReport', "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,status=yes,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+
+
+// 안전관리계획서 작성기준
+function go_smp_guide() {
+	wdt = 800; hgt = 700;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("about:blank", "smp13003i", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,status=yes,resizable=yes,left="+xPos+",top="+yPos);
+	document.help.action = '/com/redirect.do?reqUrl=safeplan/smp13003i';
+	document.help.target = 'smp13003i';
+	document.help.submit();
+}
+
+// 안전관리계획서 검토의견
+function go_smp_opinion(item_cd) {
+	wdt = 800; hgt = 600;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/com/smpOpinSearch_Pop.do?item_cd="+item_cd, "smpOpinion", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,status=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+// 설계안전성검토 검토의견
+function go_dfs_opinion(itm_cd) {
+	wdt = 800; hgt = 700;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/com/dfsOpinSearch_Pop.do?itm_cd="+itm_cd, "dfsOpinion", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,status=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+// 설계안전검토보고서 검토내역
+function go_dfs_report(rqst_no, pro_status) {
+	wdt = 840; hgt = 950;
+   	xPos = Math.ceil((screen.width - wdt) / 2);
+    yPos = Math.ceil((screen.height- hgt) / 2) - 50;
+    var pageUrl = '';
+    var popNm = 'dfsMainPop';
+    if(pro_status < '30') {
+    	pageUrl = '/dfs/dfsApplyMainPop.do?';
+    }else if(pro_status == '30') {
+    	pageUrl = '/dfs/dfsRecvMainPop.do?';
+    }else if(pro_status >= '61' && pro_status <= '90' ) {
+    	pageUrl = '/dfs/dfsSubmitMainPop.do?';
+    	popNm = 'dfsSubmitMainPop';
+    }else{	
+    	pageUrl = '/dfs/dfsCheckMainPop.do?';
+    }
+    pageUrl += 'rqst_no='+rqst_no + '&popup_yn=Y';
+	window.open(pageUrl, popNm, "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,status=yes,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+// 설계안전검토보고서 첨부서류 개요 정보
+function go_dfs_attdoc_smry(rqst_no) {
+	wdt = 1074; hgt = 800;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open('/dfs/dfsAttDocSmryInfoPop.do?rqst_no='+rqst_no,'dfsAttDocSmryInfoPop',"width="+wdt+",height="+hgt+",menubar=no,toolbar=no,status=yes,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+// 건설공사대장 정보
+function go_const_ledger(const_no) {
+	wdt = 840; hgt = 700;
+   	xPos = Math.ceil((screen.width - wdt) / 2);
+    yPos = Math.ceil((screen.height- hgt) / 2) - 50;
+	window.open('/level/lev10.do?method=cwsMain&const_no='+const_no+'&popup_yn=Y','cwsMain',"width="+wdt+",height="+hgt+",menubar=no,toolbar=no,status=yes,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+// 위원 정보
+function go_member_info(member_id) {
+	wdt = 840; hgt = 500;
+   	xPos = Math.ceil((screen.width - wdt) / 2);
+    yPos = Math.ceil((screen.height- hgt)) - 50;
+	window.open('/invs/invsMemberPop.do?member_id='+member_id,'memberPop',"width="+wdt+",height="+hgt+",menubar=no,toolbar=no,status=yes,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+// 사용자정보
+function go_user_Info(user_id) {
+	wdt = 600; hgt = 500;
+   	xPos = Math.ceil((screen.width - wdt) / 2);
+    yPos = Math.ceil((screen.height- hgt) / 2) - 50;
+	window.open('/com/userPop_Pop.do?user_id='+user_id,'userInfo',"width="+wdt+",height="+hgt+",menubar=no,toolbar=no,status=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+// 아이디찾기
+function go_find_idpw() {
+	wdt = 400; hgt = 300;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/com/other.do?method=idPwFinder", "idPwFinder", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,status=no,left="+xPos+",top="+yPos);
+}
+
+// 문자보내기
+function goSendSms(params) {
+	var wdt = 500;
+	var hgt = 700;
+	var xPos = Math.ceil((screen.width - wdt) / 2);
+	var yPos = Math.ceil((screen.height- hgt) / 2);
+	window.open("/community/smsWritePop.do"+params, "SendSms", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+	/*wdt = 500; hgt = 600;
+   	xPos = Math.ceil((screen.width - wdt) / 2);
+    yPos = Math.ceil((screen.height- hgt) / 2);
+   	window.open('/community/cmu10.do?method=sms01002_write'+params, 'sms01002', "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,status=yes,left="+xPos+",top="+yPos);*/
+}
+
+// 쪽지보내기
+function send_note(params) {
+	wdt = 500; hgt = 600;
+   	xPos = Math.ceil((screen.width - wdt) / 2);
+    yPos = Math.ceil((screen.height- hgt) / 2);
+   	window.open('/community/cmu10.do?method=not01002_write'+params, 'not01002', "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,status=yes,left="+xPos+",top="+yPos);
+}
+
+// 리포트 뷰어
+// purpose_cd : 직인코드(seal_purpose)
+// viewType : PDF -> viewer.hideToolbarItem(['ppt', 'xls', 'hwp', 'doc']);
+// 유형 추가시, 타입 추가하여 reportViewPop JSP에 분기 추가.
+function go_rpt_viewer(report_head, report_id, params, purpose_cd, const_nm, markany_yn, viewType) {
+	wdt = 1024;
+	hgt = screen.height - 100;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2) - 50;
+	var tmpParam = "";
+	console.log("go_rpt_viewer",markany_yn);
+	if(markany_yn == "Y"){
+		tmpParam = "markany_yn=Y&";
+	}
+	
+	if(viewType != undefined){
+		tmpParam += "viewType="+viewType+"&";
+	}
+
+	if (params.indexOf("[cts_report]") > -1) {
+		tmpParam += "cts_report=Y&";
+	}
+
+	window.open("/com/reportViewPop.do?" + tmpParam + "report_head=" + encodeURIComponent(report_head) + "&report_id=" + report_id + "&params=" + encodeURIComponent(params), "rptViewer", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left=" + xPos + ",top=" + yPos);
+	
+	if(purpose_cd != undefined){
+		//리포트 뷰어 실행 시 로그 insert
+		var callurl = '/com/insertSealPrintLogAjax.do';
+		var jsonData = { purpose_cd: purpose_cd , const_nm: const_nm};
+		ajaxJson(callurl, jsonData, successFunc, errFunc);
+		
+		function successFunc(data) {
+			if(data.isOk != 'Y'){
+				alert(data.errMsg);
+			}
+		}
+		function errFunc() {
+			alert('저장 처리 중, 에러가 발생하였습니다.');
+		};
+	}
+}
+
+// 수준평가 설명회 명찰 인쇄
+function go_levNameCard_rpt_viewer(report_head, report_id, params,event_seq,user_id) {
+	wdt = 1024;
+	hgt = screen.height - 100;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2) - 50;
+	var tmpParam = "";
+	
+	// if(markany_yn == "Y"){
+	// 	tmpParam = "markany_yn=Y&";
+	// }
+
+	// if (params.indexOf("[cts_report]") > -1) {
+	// 	tmpParam += "cts_report=Y&";
+	// }
+
+	window.open("/com/reportViewPop.do?" + tmpParam + "report_head=" + encodeURIComponent(report_head) + "&report_id=" + report_id + "&params=" + encodeURIComponent(params), "rptViewer", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left=" + xPos + ",top=" + yPos);
+	
+		//명찰 인쇄시 참석여부 Y
+		var callurl = '/lev/nameCradPrint.do';
+		var jsonData = {event_seq: event_seq ,
+			            user_id: user_id ,
+						attend_yn:'Y',
+					};
+		ajaxJson(callurl, jsonData, successFunc, errFunc);
+		
+		function successFunc(data) {
+			if(data.isOk != 'Y'){
+				alert(data.errMsg);
+			}
+		}
+		
+		function errFunc() {
+			alert('저장 처리 중, 에러가 발생하였습니다.');
+		};
+	
+	
+}
+
+
+function go_rpt_filename_viewer(report_head, report_id, params, file_name) {
+	wdt = 1024;
+	hgt = screen.height - 100;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2) - 50;
+	window.open("/com/reportViewPop.do?report_head=" + encodeURIComponent(report_head) + "&report_id=" + report_id + "&params=" + encodeURIComponent(params) + '&file_name=' + encodeURIComponent(file_name), "rptViewer", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left=" + xPos + ",top=" + yPos);
+}
+
+function go_smp_rpt_viewer(report_head, report_id, params, const_nm) {
+	wdt = 1024;
+	hgt = screen.height - 100;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2) - 50;
+	window.open("/com/smpReportViewPop.do?report_head=" + encodeURIComponent(report_head) + "&report_id=" + report_id + "&params=" + encodeURIComponent(params), "rptViewer", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left=" + xPos + ",top=" + yPos);
+
+	var purpose_cd = null;
+	switch (report_id) {
+		case 'SMP_SA':
+			purpose_cd = 'SA';
+			break;
+		case 'SMP_SB':
+			purpose_cd = 'SB';
+			break;
+		case 'SMP_SC':
+			purpose_cd = 'SC';
+			break;
+		case 'SMP_SD':
+			purpose_cd = 'SD';
+			break;
+		case 'SMP_SF':
+			purpose_cd = 'SF';
+			break;
+		default:
+			purpose_cd = null;
+			break;
+	}
+
+	// purpose_cd : 직인코드(seal_purpose)
+	if(purpose_cd != null){
+		//리포트 뷰어 실행 시 로그 insert
+		var callurl = '/com/insertSealPrintLogAjax.do';
+		var jsonData = {purpose_cd: purpose_cd, const_nm: const_nm};
+		ajaxJson(callurl, jsonData, successFunc, errFunc);
+
+		function successFunc(data) {
+			if(data.isOk != 'Y'){
+				alert(data.errMsg);
+			}
+		}
+		function errFunc() {
+			alert('저장 처리 중, 에러가 발생하였습니다.');
+		};
+	}
+}
+
+//건설공사대장 정보
+function go_cwstb_info(const_no) {
+	wdt = 840; hgt = 500;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height- hgt)) - 50;
+	window.open('/com/cwstbInfoPop.do?const_no='+const_no,'cwstbInfoPop',"width="+wdt+",height="+hgt+",menubar=no,toolbar=no,status=yes,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+//건설기술용역대장 정보
+function go_cemtb_info(const_no) {
+	wdt = 840; hgt = 500;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height- hgt)) - 50;
+	window.open('/com/cemtbInfoPop.do?const_no='+const_no,'cemtbInfoPop',"width="+wdt+",height="+hgt+",menubar=no,toolbar=no,status=yes,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+//사고이력
+function go_accd_hist(accd_no) {
+	wdt = 1024;
+	hgt = 600;
+   	xPos = Math.ceil((screen.width - wdt) / 2);
+    yPos = Math.ceil((screen.height- hgt) / 2);
+	window.open("/com/acdHstListModalPop.do?accd_no="+accd_no, "", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,status=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+
+// 문자보내기 : 개인
+function send_sms_message_one(userId, userNm, phoneNumber, email) {
+	var params = "";
+	params += (userId != null) ? "&rcver_id=" + userId : "";
+	params += (userNm != null) ? "&user_nm=" + encodeURIComponent(userNm) : "";
+	params += (phoneNumber != null) ? "&hp_no=" + phoneNumber : "";
+	params += (email != null) ? "&email_id=" + email : "";
+
+	wdt = 600;
+	hgt = 400;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open('/com/msgSendOnePop.do?a=1' + params, 'sms01002', "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,status=yes,left=" + xPos + ",top=" + yPos);
+}
+
+// 건설공사 종류
+function find_con_type(code, subcode, object_id) {
+	wdt = 960;
+	hgt = 1080;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	var params = "";
+	params += (subcode != null) ? "&subcode=" + subcode : "";
+	params += (object_id != null) ? "&object_id=" + object_id : "";
+	
+	var code2 = code.padLeft(2, "0");
+	console.log(code2);
+	
+	window.open('/smp/codeListPop.do?code=' + code2 + params, 'sms01002', "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,status=yes,left=" + xPos + ",top=" + yPos);
+}
+
+//건설사고신고 공사대장 찾기
+function find_smp2cws() {
+	wdt = 1024; hgt = 700;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/acd/searchSmp2cwsPop.do", "smp2cws", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+}
+
+//설계안전성검토 찾기
+function find_dfsInfo(optn) {
+	wdt = 1024; hgt = 700;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	//window.open("/acd/searchDfsByOrdPop.do"+param, "dfsPop", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+	window.open("", "dfsPop", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,status=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+	
+	jQuery("<form target='dfsPop' method='post' action='/acd/searchDfsByOrdPop.do'>" +
+		   "<input type='hidden' name='isFirst' value='Y' >" +
+		   "<input type='hidden' name='const_nm' value='"+optn.const_nm+"' >" +	
+		   "<input type='hidden' name='org_const_nm' value='"+optn.org_const_nm+"' >" +
+		   "<input type='hidden' name='org_dsn_corp_nm' value='"+optn.org_dsn_corp_nm+"' >" +
+		   "<input type='hidden' name='dsn_corp_nm' value='"+optn.dsn_corp_nm+"' >" +
+		   "<input type='hidden' name='rqst_inst_nm' value='"+optn.rqst_inst_nm+"' >" +
+		   "</form>").appendTo('body').submit().remove();
+    
+}
+
+//안전관리계획서 찾기
+function find_safePlanInfo(optn) {
+	wdt = 1024; hgt = 700;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	//window.open("/acd/searchSafePlanByOrdPop.do"+param, "dfsPop", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+	window.open("", "safePlanPop", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,status=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+	
+	jQuery("<form target='safePlanPop' method='post' action='/acd/searchSafePlanByOrdPop.do'>" +
+			   "<input type='hidden' name='isFirst' value='Y' >" +
+			   "<input type='hidden' name='const_nm' value='"+optn.const_nm+"' >" +
+			   "<input type='hidden' name='org_const_nm' value='"+optn.org_const_nm+"' >" +
+			   "<input type='hidden' name='org_con_corp_nm' value='"+optn.org_con_corp_nm+"' >" +
+			   "<input type='hidden' name='con_corp_nm' value='"+optn.con_corp_nm+"' >" +
+			   "<input type='hidden' name='ord_corp_nm' value='"+optn.ord_corp_nm+"' >" +
+			   "</form>").appendTo('body').submit().remove();
+}
+
+//KISCON 공사대장 찾기
+function find_kiscInfo() {
+	wdt = 1024; hgt = 700;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/acd/searchKiscPop.do", "smp2cws", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+}
+
+//세움터 인허가정보 찾기
+function find_eaisInfo() {
+	wdt = 1024; hgt = 700;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/acd/searchEaisPop.do", "smp2cws", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+}
+
+//KALS 공사정보 찾기
+/*
+function find_kalsInfo() {
+	wdt = 1024; hgt = 700;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/acd/searchKalsPop.do", "smp2cws", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+}
+*/
+
+//KISCON 공사대장 찾기
+function find_kiscInfo() {
+	wdt = 1024; hgt = 700;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/acd/searchKiscPop.do", "smp2cws", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+}
+
+//공사정보 찾기
+function find_constInfo(isAcdEdit) {
+
+	if(isAcdEdit == null|| isAcdEdit == undefined  || isAcdEdit == "" || isAcdEdit == "null" || isAcdEdit == "undefined" || (isAcdEdit != "Y" && isAcdEdit != "N" ) ){
+		isAcdEdit = "N";
+	}
+	
+	wdt = 1024; hgt = 700;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/acd/searchConstInfoPop.do?isAcdEdit="+isAcdEdit, "smp2cws", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,status=no,left=" + xPos + ",top=" + yPos);
+}
+
+function find_smp2cwsm() {
+	wdt = 1024; hgt = 700;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/acd/searchSmp2cwsmPop.do", "smp2cws", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left=" + xPos + ",top=" + yPos);
+}
+
+// 사고 코드 검색
+function acd_code_pop(title, idx, code_group) {
+	wdt = 600;
+	hgt = 730;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	var params = "?code=";
+	params += (title != null) ? "&title=" + encodeURIComponent(title) : "";
+	params += (idx != null) ? "&idx=" + idx : "";
+	params += (code_group != null) ? "&code_group=" + code_group : "";
+	window.open("/acd/acdCodePop.do" + params, "acdCodePop", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left=" + xPos + ",top=" + yPos);
+}
+
+//사고 사유 검색
+function acd_reason_pop(title, idx, code_group) {
+	wdt = 600;
+	hgt = 530;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("", "acdReasonPop", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,status=no,scrollbars=1,resizable=yes,left=" + xPos + ",top=" + yPos);
+	jQuery("<form target='acdReasonPop' method='post' action='/acd/acdReasonPop.do'>" +
+		   "<input type='hidden' name='code' value='' >" +	
+		   "<input type='hidden' name='title' value='"+title+"' >" +
+		   "<input type='hidden' name='idx' value='"+idx+"' >" +
+		   "<input type='hidden' name='code_group' value='"+code_group+"' >" +
+		   "<input type='hidden' name='data02' value='Y' >" +		   
+		   "</form>").appendTo('body').submit().remove();
+}
+
+// 사고 신고시간 수정
+function acd_nftc_time_edit(accd_no) {
+	wdt = 720;
+	hgt = 610;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/acd/acdNtfcTimeEditPop.do?accd_no=" + accd_no, "acdNftcTimePop", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,status=no,scrollbars=yes,resizable=yes,left=" + xPos + ",top=" + yPos);
+}
+
+// 사고 삭제 요청
+function acd_delete(accd_no) {
+	wdt = 720;
+	hgt = 620;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/acd/acdDeletePop.do?accd_no=" + accd_no, "acdDeletePop", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,status=no,scrollbars=yes,resizable=yes,left=" + xPos + ",top=" + yPos);
+}
+
+//법령 찾기
+function find_law(params) {
+	wdt = 800; hgt = 650;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/pena/penaLawViewPop.do?"+params, "penaLawViewPop", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+// 처분대상 기관찾기
+function find_dispo_orgn_code(params) {
+	wdt = 1000; hgt = 850;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/pena/dispoOrgnSearchPop.do?"+params, "orgnList", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+//국적 찾기
+function find_nation(params) {
+	wdt = 500; hgt = 600;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/sanje/sanjeNationPop.do?"+params, "sanjeNationPop", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+//직업 찾기
+function find_job(params) {
+	wdt = 500; hgt = 600;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/sanje/sanjeJob1Pop.do?"+params, "sanjeJobPop", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+//상해종류 찾기
+function find_injury_type(params) {
+	wdt = 500; hgt = 600;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/sanje/sanjeInjuryType1Pop.do?"+params, "sanjeInjuryTypePop", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+//상해부위 찾기
+function find_injury_part(params) {
+	wdt = 500; hgt = 600;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/sanje/sanjeInjuryPart1Pop.do?"+params, "sanjeInjuryPartPop", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+//그룹웨어 연동 팝업창 띄우기(key:input names ; code1: DFS,SMP)
+function go_gw(key,code1) {
+	//if(browser() == "IE") {
+	wdt = 1024; hgt = 800;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	//window.open("/gw/gwAcptListMcrPop.do?key="+key+"&code1="+code1, "gwMain", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left=" + xPos + ",top=" + yPos);
+	window.open("", "gwMain", "width=" + wdt + ",height=" + hgt + ",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left=" + xPos + ",top=" + yPos);
+	$('#form_gwPop > input[name=key]').val(key);
+	$('#form_gwPop > input[name=code1]').val(code1);
+
+	// $('#form_gwPop').attr('action','/gw/gwAcptListMcrPop.do');
+	if (code1 == "SMP") {
+		$('#form_gwPop').attr('action','/gw/gwSendListMcrPop.do');
+	} else {
+		$('#form_gwPop').attr('action','/gw/gwAcptListMcrPop.do');
+	}
+	$('#form_gwPop').attr('target','gwMain');
+	$('#form_gwPop').submit();
+	$('#form_gwPop').attr('target','_self');
+	/*}else{
+		alert("그룹웨어 기능은 Internet Explorer 브라우저에서만 사용 가능합니다.\nInternet Explorer 브라우저로 다시 접속해 주십시오.");
+	}*/
+}
+
+//post 팝업 열기
+//통합메세지 팝업창
+function sendMsgPop(inst_nm, inst_chrgr_nm, hp_no, inst_chrgr_id) {
+	wdt = 800; hgt = 800;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("", "sendMsgPop", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+	
+	$('#form_sendMsgPop > input[name=inst_nm]').val(inst_nm);
+	$('#form_sendMsgPop > input[name=inst_chrgr_nm]').val(inst_chrgr_nm);
+	$('#form_sendMsgPop > input[name=hp_no]').val(hp_no);
+	$('#form_sendMsgPop > input[name=inst_chrgr_id]').val(inst_chrgr_id);
+	
+	$('#form_sendMsgPop').attr('action','/com/sendMsgPop.do');
+	$('#form_sendMsgPop').attr('target','sendMsgPop');
+	$('#form_sendMsgPop').submit();
+	$('#form_sendMsgPop').attr('target','_self');
+}
+
+//LDAP 기관찾기
+function find_ldap_code(params) {
+	wdt = 1000; hgt = 980;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/por/ldapSearchPop.do?"+params, "ldapList", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+//품질검사대행기관 시험실찾기
+function find_qltagnt_lab(params) {
+	wdt = 1000; hgt = 600;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/por/labTorySearchPop.do?"+params, "labToryList", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+//품질검사대행기관 시험실찾기
+function find_m_qltagnt_lab(params) {
+	wdt = 1000; hgt = 600;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/por/m/labTorySearchPop.do?"+params, "labToryList", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}
+
+
+//건설공사 현장점검 바로가기 팝업 <20210506 추가>
+function open_spt_link_pop() {
+	wdt = 1000; hgt = 600;
+	xPos = Math.ceil((screen.width - wdt) / 2);
+	yPos = Math.ceil((screen.height - hgt) / 2);
+	window.open("/por/sptLinkPop.do", "sptLinkPop", "width="+wdt+",height="+hgt+",menubar=no,toolbar=no,scrollbars=yes,resizable=yes,left="+xPos+",top="+yPos);
+}

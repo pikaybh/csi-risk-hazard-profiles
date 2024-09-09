@@ -1,0 +1,444 @@
+var equipmentSpecEtc ={  
+	 nodeName:"",
+	 spec:{},
+	 htmlNode:null,
+	 yearOption:"",
+	 specSeq:0,
+	 tempSpec:null,
+	 defaultData:{},
+	 init:function(){
+		 $(".createTag").remove();
+	 },
+	 onNumberCheck:function(el){
+			   var dotDupCheckPattern = /^\d*[.]\d*$/ ;
+			   var digitCheckPattern = /(^\d+$)|(^\d{1,}.\d{0,2}$)/;
+			   var resultNumber = el.value.replace(/[^0-9.]/g,'').replace(/(\..*)\.g/, '$1')
+				  
+			  if (!dotDupCheckPattern.test(resultNumber)){
+				  resultNumber=  resultNumber.replace(/\./g,'')
+			  }
+			   if (!digitCheckPattern.test(resultNumber)){
+					  resultNumber=  resultNumber.slice(0,-1)
+			   }
+			  el.value = resultNumber;
+				 	 
+	},
+    	onChangePerfrationYn:function(el,seq){
+                     	  
+				if(el.value == "V") {
+					$('input[name="spec005'+seq+'"]').prop("readonly",false);    
+					$('input[name="spec006'+seq+'"]').prop("readonly",false);  
+					$('input[name="spec007'+seq+'"]').prop("readonly",false); 
+					$('input[name="spec008'+seq+'"]').val("").prop("readonly",true);  
+					$('input[name="spec009'+seq+'"]').val("").prop("readonly",true);   
+					$('input[name="spec010'+seq+'"]').val("").prop("readonly",true);  
+				}else if (el.value == 'H'){
+					$('input[name="spec005'+seq+'"]').prop("readonly",false);    
+					$('input[name="spec006'+seq+'"]').prop("readonly",false);  
+					$('input[name="spec007'+seq+'"]').prop("readonly",false); 
+					$('input[name="spec008'+seq+'"]').prop("readonly",false);  
+					$('input[name="spec009'+seq+'"]').val("").prop("readonly",true);   
+					$('input[name="spec010'+seq+'"]').val("").prop("readonly",true);  
+				}else if (el.value == 'T'){
+					$('input[name="spec005'+seq+'"]').val("").prop("readonly",true);    
+					$('input[name="spec006'+seq+'"]').val("").prop("readonly",true);  
+					$('input[name="spec007'+seq+'"]').val("").prop("readonly",true); 
+					$('input[name="spec008'+seq+'"]').val("").prop("readonly",true);  
+					$('input[name="spec009'+seq+'"]').prop("readonly",false);   
+					$('input[name="spec010'+seq+'"]').prop("readonly",false);  
+			 	}	
+    				
+    			 },
+			 onChangeCrushedStone:function(el,seq){
+	    	  
+				if(el.value == "J") {
+					$('input[name="spec006'+seq+'"]').prop("readonly",false);  
+					$('input[name="spec007'+seq+'"]').prop("readonly",false);  
+					$('input[name="spec008'+seq+'"]').val("").prop("readonly",true);  
+					$('input[name="spec009'+seq+'"]').val("").prop("readonly",true);   
+					$('input[name="spec010'+seq+'"]').val("").prop("readonly",true);  
+				}else if (el.value == 'C'){
+					$('input[name="spec006'+seq+'"]').prop("readonly",false);  
+					$('input[name="spec008'+seq+'"]').prop("readonly",false);  
+					$('input[name="spec007'+seq+'"]').val("").prop("readonly",true);  
+					$('input[name="spec009'+seq+'"]').val("").prop("readonly",true);   
+					$('input[name="spec010'+seq+'"]').val("").prop("readonly",true);   
+				}else if (el.value == 'R'){
+				
+					$('input[name="spec009'+seq+'"]').prop("readonly",false);
+					$('input[name="spec010'+seq+'"]').prop("readonly",false);
+					$('input[name="spec006'+seq+'"]').val("").prop("readonly",true); 
+					$('input[name="spec007'+seq+'"]').val("").prop("readonly",true);  
+					$('input[name="spec008'+seq+'"]').val("").prop("readonly",true);   
+			 	}else if (el.value == 'G'){
+			 		$('input[name="spec006'+seq+'"]').prop("readonly",false);  
+			 		$('input[name="spec008'+seq+'"]').prop("readonly",false);
+			 		$('input[name="spec007'+seq+'"]').val("").prop("readonly",true); 
+					$('input[name="spec009'+seq+'"]').val("").prop("readonly",true);   
+					$('input[name="spec010'+seq+'"]').val("").prop("readonly",true);  
+			 	}		
+					
+			},
+			onChangeDredge:function(el,seq){
+		    	  
+				if(el.value == "P") {
+					$('input[name="spec005'+seq+'"]').prop("readonly",false);  
+					$('input[name="spec006'+seq+'"]').prop("readonly",false);  
+					$('input[name="spec007'+seq+'"]').prop("readonly",false);  
+					$('input[name="spec008'+seq+'"]').val("").prop("readonly",true);  
+					$('input[name="spec009'+seq+'"]').val("").prop("readonly",true);   
+					$('input[name="spec010'+seq+'"]').val("").prop("readonly",true);  
+					$('input[name="spec011'+seq+'"]').val("").prop("readonly",true); 
+				}else if (el.value == 'B'){
+					
+					$('input[name="spec008'+seq+'"]').prop("readonly",false);  
+					$('input[name="spec009'+seq+'"]').prop("readonly",false);  
+					$('input[name="spec005'+seq+'"]').val("").prop("readonly",true);  
+					$('input[name="spec006'+seq+'"]').val("").prop("readonly",true);  
+					$('input[name="spec007'+seq+'"]').val("").prop("readonly",true);   
+					$('input[name="spec010'+seq+'"]').val("").prop("readonly",true);  
+					$('input[name="spec011'+seq+'"]').val("").prop("readonly",true);   
+				}else if (el.value == 'D'||el.value == 'G'){
+					
+					
+					$('input[name="spec010'+seq+'"]').prop("readonly",false);  
+					$('input[name="spec011'+seq+'"]').prop("readonly",false);  
+					$('input[name="spec005'+seq+'"]').val("").prop("readonly",true);  
+					$('input[name="spec006'+seq+'"]').val("").prop("readonly",true);  
+					$('input[name="spec007'+seq+'"]').val("").prop("readonly",true);   
+					$('input[name="spec008'+seq+'"]').val("").prop("readonly",true);  
+					$('input[name="spec009'+seq+'"]').val("").prop("readonly",true);   
+			 	}
+					
+			},
+			onChangeWheel:function(el,seq){
+		    	  
+				if(el.value == "T") {
+					$('input[name="spec009'+seq+'"]').prop("readonly",false);  
+					$('input[name="spec010'+seq+'"]').prop("readonly",false);  
+					$('input[name="spec007'+seq+'"]').val("").prop("readonly",true); 
+					$('select[name="spec008'+seq+'"]').val("").attr("disabled","disabled");  
+
+				}else if (el.value == 'M'){
+					$('input[name="spec007'+seq+'"]').prop("readonly",false);  
+					$('select[name="spec008'+seq+'"]').removeAttr("disabled"); 
+					$('input[name="spec009'+seq+'"]').val("").prop("readonly",true); 
+					$('input[name="spec010'+seq+'"]').val("").prop("readonly",true);  
+				}
+					
+			},
+		onTrigger:function(){
+			
+		var eqArr =["EQ001","EQ007","EQ002","EQ003","EQ015","EQ006","EQ005","EQ025","EQ026","EQ017","EQ016","EQ004","EQ012","EQ022"]
+			if( _.indexOf (eqArr, equipmentSpecEtc.tempSpec[0].equipment_cd) !=-1){
+				/*$('select[name^="spec_standard"]').trigger("change");  */
+				$('select[name^="spec"]').trigger("change"); 
+			}
+		},		 
+	 common:{
+		 hederHtml:function(){
+			
+			 
+			 var chunks = _.chunk(equipmentSpecEtc.tempSpec,equipmentSpecEtc.tempSpec.length) 
+			 var spec = equipmentSpecEtc.spec;
+			  specSeq= equipmentSpecEtc.specSeq ;
+			 
+		     var  html  =' <table id="specTable" class="table table-bordered">'
+		          html  +=' 	<thead>'
+		          html  +=' 		<tr class="t-center">'
+		     var thHtml=""; 
+		     var row = chunks.map(function(chunk){
+			 		 var cells = chunk.map(function(data){
+					 if (_.isEmpty(data.unit)){
+						 thHtml = 	 '<th>'+ data.spec_nm+'</th>'
+					 }else{
+						 thHtml = 	 '<th>'+ data.spec_nm+'('+data.unit+')</th>'
+					 }
+					 return thHtml 
+//					 return '<th>'+ data.spec_nm+'</th>'
+				 }).join('');
+				 return cells 
+			 });
+			 html  += row.join("")
+			 html  +='				<th width="3%" rowspan="2" id="addBtn">'
+			 html  +='					<button type="button" class="btn dark" onclick="onAddEquipment()">'
+			 html  +='						<i class=""></i>추가'
+			 html  +='					</button>'
+			 html  +='				</th>'
+			 html  +='			</tr>'
+			 html  +='		</thead>'
+			 html  +='		 <tbody id="bodySpec">'
+			 html  +='		</tbody>'
+			 html  +='	</table>'
+		
+			 return html;
+			 
+		 },
+		 inputHtml:function(){
+			 var chunks = _.chunk(equipmentSpecEtc.tempSpec,2) 
+			 var row = chunks.map(function(chunk,index){
+				 var cells = chunk.map(function(data){
+					 return '<th class="td-header">'+data.spec_nm+'</th><td class="t-left">'+equipmentSpecEtc.common.getStrTag(data,index,'Y')+'</td>'
+				 }).join('');	 
+				 return "<tr>"+cells+"</tr>" 
+			 })
+			 return row.join("");
+		 },
+		 inputHtmlRentel:function(){
+			
+			 var chunks = _.chunk(equipmentSpecEtc.tempSpec,equipmentSpecEtc.tempSpec.length) 
+			 var spec = equipmentSpecEtc.spec;
+			  var specSeq= equipmentSpecEtc.specSeq ;
+			  var deleteHiddenTag ='<input name="equipment_seq'+specSeq+'" type="hidden"> <input id="row_status'+specSeq+'" name="row_status'+specSeq+'" type="hidden">'
+			 var row = chunks.map(function(chunk){
+				 var cells = chunk.map(function(data){
+					 return '<td>'+equipmentSpecEtc.common.getStrTag(data,specSeq)+'</td>'
+				 }).join('');
+				 return '<tr id ="specLine'+specSeq+'" name="specLine'+specSeq+'">'+cells+'<td>'+deleteHiddenTag+'<button type="button" class="btn red" name="specLine'+specSeq+' "onclick = "onDeleteHide(this,\''+specSeq+'\')" > <i class=""></i>삭제</button></td></tr>' 
+			 })
+			return row.join("");
+			 
+		 },
+		 viewHtmlRentel:function(){
+			 
+			 var chunks = _.chunk(equipmentSpecEtc.tempSpec,equipmentSpecEtc.tempSpec.length) 
+			 var spec = equipmentSpecEtc.spec;
+			  specSeq= equipmentSpecEtc.specSeq ;
+			 var row = chunks.map(function(chunk){
+				 var cells = chunk.map(function(data){
+					 return '<td>'+ equipmentSpecEtc.common.getConvertName (data,spec[data.spec_alias_nm])+'</td>'
+				 }).join('');
+				 return '<tr">'+cells+'</tr>' 
+			 })
+			return row.join("");
+			 
+			 
+		 },
+		 viewHtml:function(spec){
+			 var spec = equipmentSpecEtc.spec;
+			 var chunks = _.chunk(equipmentSpecEtc.tempSpec,2) 
+			 var row = chunks.map(function(chunk,index){
+				 var cells = chunk.map(function(data){
+					 return '<th class="td-header">'+data.spec_nm+'</th><td class="t-left">'+ equipmentSpecEtc.common.getConvertName (data,spec[data.spec_alias_nm])+' <span style="font-size:12px">'+data.unit+'</span></td>'
+				 }).join('');	 
+				 return "<tr>"+cells+"</tr>" 
+			 })
+			 return row.join("");
+			 
+		 },
+		 serchHtml:function(){
+			 
+			 var chunks = _.chunk(equipmentSpecEtc.tempSpec,2) 
+			 var row = chunks.map(function(chunk,index){
+				 var cells = chunk.map(function(data){
+					 return '<td class="td-header t-left">'+data.spec_nm+'</th><td class="t-left">'+equipmentSpecEtc.common.getSearchTag(data)+'</td>'
+				 }).join('');	 
+				 return "<tr class='createTag'>"+cells+"</tr>" 
+			 })
+			 return row.join("");
+			 
+		 },
+		 getStrTag:function(data,index,unitYn){
+				var html ="";	
+				console.log('index',index);
+				 var spec = equipmentSpecEtc.spec;
+				 var specSeq = equipmentSpecEtc.specSeq;
+					if (data.spec_alias_nm == "prod_yyyy"){
+					      html  +=' 	<div  style="width:110px" class="form-inline">'
+						  html  +=' 		<div class="input-group">'
+						  if (specSeq==0){
+							  html  +=' 	 <select id="prod_yyyy"  name="prod_yyyy"  class="form-control" style="width:80px"> '
+						  }else{
+							  html  +=' 	 <select id="prod_yyyy'+specSeq+'"  name="prod_yyyy'+specSeq+'"  class="form-control" style="width:80px"> '
+						  }
+						  html  +=               equipmentSpecEtc.yearOption
+						  html  +='       		</select>'
+						  html  +='   		<span style="font-size:12px;margin-left: 5px;">이후</span></div>'
+						  html  +=' 	</div>'
+					}else if (data.spec_alias_nm == "spec_standard") {
+					     var standardArray = data.spec_standard.split(",");
+					      html  +=' 	<div class="form-inline">'
+					      html  +=' 	   <div class="input-group">'
+					      html  +=' 	 	<select id="spec_standard'+specSeq+'"   name="spec_standard'+specSeq+'"  '+equipmentSpecEtc.common.getEvent(data.equipment_cd ,specSeq)+' class="form-control" style="width:80px"> '   
+										 
+					      _.forEach(standardArray,function(option,index){
+					    	  var optarray = option.split("|");
+					    	  html  +=' <option value = "'+optarray[1]+'" ' + (spec[data.spec_alias_nm] == optarray[1] ? "selected":"") + '>'+optarray[0]+'</option>'
+								
+						});
+					      html  +='       		</select>'
+					      html  +='   		</div>'
+					      html  +=' 	</div>'
+					}else if (data.input_type == "SELECT") {
+					     var standardArray = data.spec_standard.split(",");
+					  /*   var elEvent = 'onchange ="equipmentSpecEtc.onChangeWheel( this,\''+specSeq+'\')" '	     */
+
+					      html  +=' 	<div class="form-inline">'
+					      html  +=' 	  <div class="input-group">'
+                                              html  +=' 	    <select id="'+data.spec_alias_nm+specSeq+'"   name="'+data.spec_alias_nm+specSeq+'"  class="form-control" style="width:80px"> '   
+										 
+					      _.forEach(standardArray,function(option,index){
+					    	  var optarray = option.split("|");
+					    	  html  +=' <option value = "'+optarray[1]+'" ' + (spec[data.spec_alias_nm] == optarray[1] ? "selected":"") + '>'+optarray[0]+'</option>'
+								
+							});
+						  html  +='       		</select>'
+						  html  +='   		</div>'
+						  html  +=' 	</div>'		  
+					}else{
+						
+						if(unitYn != 'Y'){ 
+							html  +=' <input type="text" name="'+data.spec_alias_nm+specSeq+'" style="width:100%"  class="form-control" oninput ="equipmentSpec.onNumberCheck(this)" value="'+spec[data.spec_alias_nm]+'">'
+						}else{
+							html  +=' <input type="text" name="'+data.spec_alias_nm+'" style="width:100px"  oninput ="equipmentSpec.onNumberCheck(this)"  class="form-control" value="'+spec[data.spec_alias_nm]+'" ><span style="font-size:12px"> '+data.unit+'</span>'	 
+						}
+					}
+				
+				return  html  
+		},
+		getSearchTag:function(data){
+			var html ="";	
+			if (data.spec_alias_nm == "prod_yyyy"){
+			      html  +=' 	<div  style="width:110px" class="form-inline">'
+				  html  +=' 		<div class="input-group">'
+				  html  +=' 	 <select id="prod_yyyy"  name="prod_yyyy"  class="form-control" style="width:80px"> '
+				 
+				  html  +=               equipmentSpecEtc.yearOption
+				  html  +='       		</select>'
+				  html  +='   		<span style="font-size:12px;margin-left: 5px;">이후</span></div>'
+				  html  +=' 	</div>'
+			}else if (data.spec_alias_nm == "spec_standard") {
+				  var standardArray = data.spec_standard.split(",");
+				  
+			      html  +=' 	<div class="form-inline">'
+				  html  +=' 		<div class="input-group">'
+			
+				  html  +=' 	 <select id="spec_standard"  name="spec_standard"  class="form-control" style="width:80px"> '
+				
+				  
+			     _.forEach(standardArray,function(option,index){
+			    	  var optarray = option.split("|");
+			    	  html  +=' <option value = "'+optarray[1]+'">'+optarray[0]+'</option>'
+						
+					});
+				  html  +='       		</select>'
+				  html  +='   		</div>'
+				  html  +=' 	</div>'
+			}else if (data.input_type == "SELECT") {
+				  var standardArray = data.spec_standard.split(",");
+				  
+			      html  +=' 	<div class="form-inline">'
+				  html  +=' 		<div class="input-group">'
+				/*  html	+='	  	<input type="text" name="'+data.spec_alias_nm+'_max" ></span>'*/
+				  html  +=' 	 <select name="'+data.spec_alias_nm+'_min"   class="form-control" style="width:80px"> '
+				
+				  
+			     _.forEach(standardArray,function(option,index){
+			    	  var optarray = option.split("|");
+			    	  html  +=' <option value = "'+optarray[1]+'">'+optarray[0]+'</option>'
+						
+					});
+				  html  +='       		</select>'
+				  html  +='   		</div>'
+				  html  +=' 	</div>'		  
+			}else{
+				html	+='	  		<input type="text" name="'+data.spec_alias_nm+'_min"  style="width:80px"  class="form-control"><span style="font-size: 14px; margin-right: 10px;"> '+data.unit+' 이상 ~</span>'
+				html	+='	  		<input type="text" name="'+data.spec_alias_nm+'_max"  style="width:80px"  class="form-control"><span style="font-size: 14px; margin-right: 10px;"> '+data.unit+' 이하</span>'
+			}
+			return  html  
+		},
+		getConvertName:function(data ,value){
+			var resultValue=value
+			const lt   =["EQ001"];
+			const vht  =["EQ007"];
+			const re   =["EQ002"];
+			const rl   =["EQ003"];
+			const jcrg =["EQ015"];
+			const tc   =["EQ006","EQ005","EQ025","EQ026","EQ017"];
+			const tm   =["EQ016","EQ004","EQ012"];
+			const pbdg =["EQ022"];
+			
+		
+			if (data.spec_alias_nm=="spec_standard"){
+				if(_.indexOf (vht, data.equipment_cd) !=-1){
+					if(value=='V'){
+						resultValue ="수직천공형"
+					}else if (value=="H"){
+						resultValue="수평천공형"
+					}else{
+						resultValue="TBM"
+					}
+				}else if(_.indexOf (re, data.equipment_cd) !=-1){
+					if(value=='R'){
+						resultValue ="이동식"
+					}else if (value=="E"){
+						resultValue="기타"
+					}
+				}else if(_.indexOf (rl, data.equipment_cd) !=-1){
+					if(value=='R'){
+						resultValue ="이동식"
+					}else if (value=="L"){
+						resultValue="트럭적재식"
+					}
+				}else if(_.indexOf (jcrg, data.equipment_cd) !=-1){
+					if(value=='J'){
+						resultValue ="조"
+					}else if (value=="C"){
+						resultValue="콘"
+					}else if (value=="R"){
+						resultValue="롤"
+					}else if (value=="G"){
+						resultValue="자이러트리"
+					}
+				}else if(_.indexOf (tc, data.equipment_cd) !=-1){
+					if(value=='T'){
+						resultValue ="타이어식"
+					}else if (value=="C"){
+						resultValue="무한궤도식"
+					}
+				}else if(_.indexOf (tm, data.equipment_cd) !=-1){
+					if(value=='T'){
+						resultValue ="타이어식"
+					}else if (value=="M"){
+						resultValue="전동식"
+					}
+				}else if(_.indexOf (pbdg, data.equipment_cd) !=-1){
+					if(value=='P'){
+						resultValue ="펌푸식"
+					}else if (value=="B"){
+						resultValue="버킷식"
+					}else if (value=="D"){
+						resultValue="디퍼식"
+					}else if (value=="G"){
+						resultValue="그래브식"
+					}
+				}
+			}
+			 if(data.input_type=="SELECT"){
+				if(value=='F'){
+					resultValue ="전륜"
+				}else if (value=="R"){
+					resultValue="후륜"
+				}
+			}
+
+			return resultValue;
+		},
+		getEvent:function(equipment_cd,index){
+			var resultEvent  =""
+				 if (equipment_cd =='EQ007') { 
+					 resultEvent ='onchange ="equipmentSpecEtc.onChangePerfrationYn( this,\''+index+'\')" '
+				  } else if(equipment_cd == 'EQ015'){
+					resultEvent ='onchange ="equipmentSpecEtc.onChangeCrushedStone( this,\''+index+'\')" '
+				  } else if(equipment_cd == 'EQ012'){
+					resultEvent ='onchange ="equipmentSpecEtc.onChangeWheel( this,\''+index+'\')" '
+				  } else if(equipment_cd == 'EQ022'){
+					resultEvent ='onchange ="equipmentSpecEtc.onChangeDredge( this,\''+index+'\')" '
+			  }
+			return resultEvent;
+		},
+	 },
+	 
+}
+
+

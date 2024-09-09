@@ -1,0 +1,371 @@
+
+		
+		
+	
+		//검색범위 개별 선택
+		$(document).on('click','.chk',function(){
+		    if($('input[class=chk]:checked').length==$('.chk').length){
+		     //   $('#chk_all').prop('checked',true);
+		    }else{
+		       $('#chk_all').prop('checked',false);
+		    }
+
+		});
+		
+		//검색범위 전체선택
+		$(document).on('click','#chk_all',function(){
+		    if($('#chk_all').is(':checked')){
+		       $('.chk').prop('checked',false);
+		    }else{
+		    	$('#chk_all').prop('checked',true);
+		        $('.chk').prop('checked',false);
+		    }
+		});
+		
+		
+
+		
+		
+		
+		
+		
+		function detailSearchOpen() {
+			$(".detail-option-wrapper").toggle();
+		};
+		
+		function detailSearchClose() {
+			$(".detail-option-wrapper").css("display","none");
+		};
+		
+		
+		
+		function dayCheck(day) {
+			var date = new Date();
+			
+			if(day=="oneWeek"){
+				var d = new Date();
+				var dayOfMonth = d.getDate();
+				d.setDate(dayOfMonth-7);
+				var startyear = d.getFullYear();
+				var startmonth = new String(d.getMonth()+1);
+				var startday = new String(d.getDate());
+			}
+			
+			if(day=="oneMonth"){
+				var d = new Date();
+				var dayOfMonth = d.getDate();
+				d.setDate(dayOfMonth-30);
+				var startyear = d.getFullYear();
+				var startmonth = new String(d.getMonth()+1);
+				var startday = new String(d.getDate());
+			}
+			
+			if(day=="threeMonth"){
+				var d = new Date();
+				var dayOfMonth = d.getDate();
+				d.setDate(dayOfMonth-90);
+				var startyear = d.getFullYear();
+				var startmonth = new String(d.getMonth()+1);
+				var startday = new String(d.getDate());
+			}
+			
+			var endyear = date.getFullYear();
+			var endmonth = new String(date.getMonth()+1);
+			var endday = new String(date.getDate());
+			
+			
+			
+			if(endmonth.length==1) {
+				endmonth = "0" + endmonth;
+			}
+			if(endday.length==1){
+				endday = "0" + endday;
+			}
+			
+			if(startmonth.length==1) {
+				startmonth = "0" + startmonth;
+			}
+			if(startday.length==1){
+				startday = "0" + startday;
+			}
+			
+			
+			$("#note_ymd_to").val(endyear+"-"+endmonth+"-"+endday); 
+			$("#note_ymd_from").val(startyear+"-"+startmonth+"-"+startday); 
+			
+		}
+		
+		
+		function searchSubmit(){
+			
+			setCookie("diquest",$("#searchTerm").val()); //최근검색어 추가
+			$("#searchType").val('all');
+			var chkArray = new Array(); // 배열 선언
+
+			
+			if($('#chk_all').is(':checked')){
+				$("#searchRange").val('all');
+			}else{
+				$('input:checkbox[name=rangeCheck]:checked').each(function() { // 체크된 체크박스의 value 값을 가지고 온다.
+		            chkArray.push(this.value);
+		        });
+		        $('#searchRange').val(chkArray);
+			}
+			document.search.submit();
+		}
+		
+		function goSearchCategory(url,name){
+			$("#search_Page").val('1');
+			if(name=='SCH00001'){
+				
+				$("#search_Type").val('all')
+			}else if(name=='SCH00002'){
+				
+				$("#search_Type").val('ACCIDENT')
+			}else if(name=='SCH00003'){
+				$("#search_Type").val('QUALITY_RECORD')
+			}else if(name=='SCH00004'){
+				$("#search_Type").val('SIRYO_GUIDE')
+			}else if(name=='SCH00005'){
+				$("#search_Type").val('NEWS')
+			}else if(name=='SCH00006'){
+				$("#search_Type").val('GUIDE_INFO')
+			}else if(name=='SCH00007'){
+				$("#search_Type").val('NOTICE')
+			}else if(name=='SCH00008'){
+				$("#search_Type").val('FAQ')
+			}else if(name=='SCH00009'){
+				$("#search_Type").val('DATA')
+			}else{
+				$("#search_Type").val(name)
+			}
+			$("#researchAddCheck").val('0');
+			
+			
+			document.searchMove.target = '_self';
+			document.searchMove.action = url;
+			document.searchMove.submit();	
+		}
+		
+		function dateAndsize(){
+			
+			var order = $("input[name='radioInline']:checked").val();
+			var size = $("#search_pSize option:selected").val();
+			$("#search_order").val(order);
+			$("#search_size").val(size);
+			$("#researchAddCheck").val('0');
+			$("#search_Page").val('1');
+			
+			document.searchMove.submit();
+		}
+		
+		
+		function movePage(page){
+			$("#search_Page").val(page);
+			
+			document.searchMove.submit();
+		}
+		
+		
+		
+		
+		
+		//최근검색어 쿠키
+		//쿠키값 불러오기
+		$(document).ready(function(){
+			
+			var str = getCookie("diquest");
+			var str2="";
+			if(str!=null){
+				str2 = "<ul >";
+				
+				var allCookies = str.split('/');
+				var check =0;
+				for(i=0;i<allCookies.length&&i<10;i++){
+					if(allCookies[i]!=""){
+						check = check+1
+						str2 += "<li id='"+allCookies[i]+"'><a href='javascript:void(0);' onclick='keywordSearch(";
+						str2 += '"'+allCookies[i]+'"';
+						str2 += "); return false;'><em>"+check+"</em>"
+						str2 += allCookies[i]+"</a></li>";
+						
+					}
+				}
+				str2+="</ui>";
+				$("#recent").html(str2);
+			}
+		});
+		
+		function getCookie(cookieName) {
+			var search = cookieName + "=";
+			var cookie = document.cookie;
+			// 현재 쿠키가 존재 할 경우
+			if(cookie.length>0) {
+				// 해당 쿠키명이 존재하는지 검색한 후 존재하면 위치를 리턴
+				startIndex = cookie.indexOf(cookieName);
+				//만약 존재한다면
+				if(startIndex !=-1){
+					//값을 얻어내기 위해 시작 인덱스 조절
+					startIndex += cookieName.length;
+					//값을 얻어내기 위해 종료 인덱스 추출
+					endIndex = cookie.indexOf(";",startIndex);
+				//만약 종료 인덱스를 못찾게 되면 쿠키 전체길이로 설정
+				if(endIndex ==-1) {
+					endIndex = cookie.length;
+				}
+				//쿠키값을 추출하여 리턴
+				return unescape(cookie.substring(startIndex +1 , endIndex));
+				
+				
+				}else{
+					//쿠키 내에 해당 쿠키가 존재하지 않을 경우
+					return "";
+				}
+			}else{
+				//쿠키 자체가 없을 경우
+				return "";
+			}
+		}
+		
+		function setCookie(cookieName,cookieValue) {
+			var ex = getCookie(cookieName);
+			var index = ex.indexOf(cookieValue);
+			if(index==-1) {
+				document.cookie = cookieName + "=" + escape(cookieValue+"/"+ ex).replace("undefined","")+";path=/";
+			}else{
+				ex = ex.replace(cookieValue+"/","");
+				document.cookie = cookieName + "=" + escape(cookieValue+"/"+ex).replace("undefined","")+";path=/";
+			}
+		}
+		
+		//최근검색어,인기검색어 자동완성 누르고 검색
+		function keywordSearch(searchTerm) {
+			
+			setCookie("diquest",$("#searchTerm").val()); //최근검색어 추가
+			$("#searchTerm").val(searchTerm);
+			
+			go_sch_search();
+		}
+		
+		//항목별 검색
+		function oneSearch(searchType) {
+			if($('#chk_all').is(':checked')){
+				$("#searchRange").val('all');
+			}else{
+				$('input:checkbox[name=rangeCheck]:checked').each(function() { // 체크된 체크박스의 value 값을 가지고 온다.
+		            chkArray.push(this.value);
+		        });
+		        $('#searchRange').val(chkArray);
+			}
+			
+			setCookie("diquest",$("#searchTerm").val()); //최근검색어 추가
+			$("#searchType").val(searchType);
+			$("#researchAddCheck").val('0');
+			$('#diquestForm').submit();
+		}
+		
+
+		//자동완성
+		var index=0;
+		function autoCompletes(event){
+			var originTag = $("#searchTerm").val();
+			var code = event.keyCode; //키보드 이벤트 키 값
+			
+			var checkCount =0;
+			
+			
+			if(code!=40 && code!=38 &&code!=13){
+				//alert($("#searchTerm").val());
+				$.ajax({
+					type : "GET",
+			        url : "/search/autoCompleteAjax.do",
+			        data : {"keyword" :$("#searchTerm").val()},
+			        dataType    : "json",
+			        error : function(){
+			   
+			        },
+			        success : function(rstData, status){
+						var text = "";
+						text += "<ul>";
+			        	if(rstData.rtnList.length > 0){
+							
+							var keyword = "";
+							var count = "";
+						
+							
+							for (var i=0; i < rstData.rtnList.length; i++) {
+								var rowObj 		= rstData.rtnList[i];
+								
+								keyword = rowObj.keyword;
+								count = rowObj.count;
+								
+								
+								checkCount = rstData.rtnList.length+1;
+								
+								text += "<li><a href='javascript:void(0);' onclick='keywordSearch(";
+								text +=  '"'+keyword+'"';
+								text += "); return false;'>"+keyword+"</a></li>";
+								
+							}
+							
+						}else{
+							text = "<li>검색 결과가 없습니다.</li>";
+						}
+			        	text += "<ul>";
+			        	
+			        	$("#search-select").html(text) ;
+			        }
+			         
+			    });
+			}
+			
+			
+			var len = $("#search-select > ul > li").length;//검색된 리스트 수
+			
+			
+			if(len>0){  //검색결과가 하나라도 있는 경우
+				var start = index;
+				if(code ==40){    //아래방향키 눌렀을 때
+					index++;
+					if(index > len){  //마지막 인덱스 까지 간 경우
+						
+						$("#search-select > ul > li:nth-child("+(index-1)+")").css('background-color','');
+						
+						index = 0;
+						$("input[name=searchTerm]").val(originTag);  //검색창에 처음 입력한 검색값을 넣는다.
+						return;
+					}else{
+						if(index>=0){ //정상적인 경우
+							var tagName = $.trim($("#search-select > ul > li:nth-child("+index+") a").text());
+							$("input[name=searchTerm]").val(tagName);
+							$("#search-select > ul > li:nth-child("+index+")").css('background-color','#D5D5D5');
+							$("#search-select > ul > li:nth-child("+(index-1)+")").css('background-color','');
+							
+							
+						}
+						//index++;
+						
+					}
+				}else if(code==38){
+					index--;
+					if(index==0){
+						$("input[name=searchTerm]").val(originTag);
+						$("#search-select > ul > li:nth-child("+(index+1)+")").css('background-color','');
+					}else{
+						if(index<0){
+							index = len+1;
+						}else{
+							var tagName = $.trim($("#search-select > ul > li:nth-child("+index+") a").text());
+							$("input[name=searchTerm]").val(tagName);
+							$("#search-select > ul > li:nth-child("+index+")").css('background-color','#D5D5D5');
+							$("#search-select > ul > li:nth-child("+(index+1)+")").css('background-color','');
+						}
+					}
+					
+				}
+			}
+
+		}
+		
+		
+	

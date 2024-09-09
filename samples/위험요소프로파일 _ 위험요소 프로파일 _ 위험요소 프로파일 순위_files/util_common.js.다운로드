@@ -1,0 +1,3468 @@
+
+/**
+ * html 로딩시 초기화 처리
+ */
+$(document).ready(function() {
+	
+    $("form[ftype='auto']").each(function() {
+    	fvInit("#" + $(this).attr("id"));
+    });
+
+    $(document).on("focus", ":input", function() {
+    	$(this).select();
+    });
+    
+    // 20200522 웹접근성 보완으로 인한 datepicker의 버튼에 엔터키 이벤트 제거
+    $('.date-picker .btn').keypress(function(event) {
+        if (event.keyCode == 13) {
+            event.preventDefault();
+        }
+    });
+
+	$("input[type='text']").keypress(function(event) {
+        if (event.keyCode === 13) {
+            event.preventDefault();
+        }
+    });
+
+    $(".tYMD").unbind("blur");
+    $(document).on("blur", ".tYMD",function() {
+        $(this).val($(this).val().getFormatVal("YMD"));
+    });
+    //$(".tYMD").unbind("focus"); // 20200520 포커스 이벤트를 모두 지우기때문에 키보드로만 이동시 datepicker 팝업이 선택되지 않아 삭제
+    $(document).on("focus", ".tYMD",function() {
+    	//$(this).val($(this).val().replaceAll("-", ""));
+    	$(this).val($(this).val().getFormatVal("YMD")); /**날짜에 자동으로 하이픈 추가 20210715:KJK*/
+    });
+    $(".tMONEY").unbind("blur");
+    $(document).on("blur", ".tMONEY",function() {
+        $(this).val($(this).val().getFormatVal("MONEY"));
+    });
+    $(".tMONEY").unbind("focus");
+    $(document).on("focus", ".tMONEY",function() {
+        $(this).val($(this).val().replaceAll(",", ""));
+    });
+    $(".tMONEY").unbind("blur");
+    $(document).on("blur", ".tMONEY",function() {
+        $(this).val($(this).val().getFormatVal("MONEY"));
+    });
+    $(".tFMONEY").unbind("focus");
+    $(document).on("focus", ".tFMONEY",function() {
+        $(this).val($(this).val().replaceAll(",", ""));
+    });
+    $(".tFMONEY").unbind("blur");
+    $(document).on("blur", ".tFMONEY",function() {
+        $(this).val($(this).val().getFormatVal("MONEY"));
+    });
+    $(".tYMD_HH24MI").unbind("blur");
+    $(document).on("blur", ".tYMD_HH24MI",function() {
+        $(this).val($(this).val().getFormatVal("YMD_HH24MI"));
+    });
+    $(".tYMD_HH24MI").unbind("focus");
+    $(document).on("focus", ".tYMD_HH24MI",function() {
+        $(this).val($(this).val().replace(/[-|:| ]/g, ""));
+    });
+    $(".tHH24MI").unbind("blur");
+    $(document).on("blur", ".tHH24MI",function() {
+        $(this).val($(this).val().getFormatVal("HH24MI"));
+    });
+    $(".tHH24MI").unbind("focus");
+    $(document).on("focus", ".tHH24MI", function () {
+        $(this).val($(this).val().replace(/[-|:| ]/g, ""));
+    });
+    $(".tYMD").each(function() {
+        $(this).val($(this).val().getFormatVal("YMD"));
+    });
+    $(".tMONEY").each(function() {
+        $(this).val($(this).val().getFormatVal("MONEY"));
+        $(this).css("text-align", "right");
+    });
+    $(".tFMONEY").each(function() {
+        $(this).val($(this).val().getFormatVal("MONEY"));
+        $(this).css("text-align", "right");
+    });
+    $(".tYMD_HH24MI").each(function() {
+        $(this).val($(this).val().getFormatVal("YMD_HH24MI"));
+    });
+    $(".tHH24MI").each(function () {
+        $(this).val($(this).val().getFormatVal("HH24MI"));
+    });
+    $("input[type=file]").unbind("change");
+    $(document).on("change", "input[type=file]", function() {
+    	if ($(this).attr("accept_ext") != undefined && $(this).attr("accept_ext") != "") {
+    		var acceptExt = $(this).attr("accept_ext");
+    		var fileExt = $(this).val().substring($(this).val().lastIndexOf(".")+1);
+
+    		if (fileExt == "" || acceptExt.toLowerCase().indexOf(fileExt) == -1) {
+    			alert("첨부하실 수 없는 확장자입니다.\n\n허용확장자[" + acceptExt + "]");
+    		}
+    	}
+    	
+    	/** MAX filesize 제한 20210614 kjk 일반 input file*/
+    	if($(this)[0].className != "irx-hidden-input"){
+    		if('undefined' == typeof($(this)[0].files[0])) return;
+    		
+    		var fileSize = $(this)[0].files[0].size; //byte
+        	var maxSize = 157286400; //150MB
+            if(fileSize > maxSize){
+               alert(getfileSize(maxSize)+" 초과 파일은 첨부할 수 없습니다.");
+               $(this)[0].value="";
+               return;
+            }
+    	}
+    });
+    
+    /** MAX filesize 제한 20210615 kjk 커스텀 input file*/
+    $("input[type=file]").on("change",function(){
+    	if('undefined' == typeof($(this)[0].files[0])) return;
+    	
+    	var fileSize = $(this)[0].files[0].size; //byte
+    	var maxSize = 157286400; //150MB
+        if(fileSize > maxSize){
+        	alert(getfileSize(maxSize)+" 초과 파일은 첨부할 수 없습니다.");
+           $(this)[0].value="";
+           return;
+        }
+    });
+    // $(".required").each(function() {
+    //     $(this).css("background-color", getItemColor('required'));
+    // });
+    // CSS로 처리하기 때문에 삭제하였습니다. [담당자 : 이상혁 / 수정일자 : 2018-11-02]
+
+    $(document).on("keyup", ".autoTab", function() {
+                if ($(this).attr("maxlength") != undefined
+                        && $(this).attr("maxlength") != "") {
+                    if ($(this).val().length == $(this).attr(
+                            "maxlength")) {
+                        // $(this).next("input").focus();
+                        $(
+                                ":input:eq("
+                                        + ($(":input").index(this) + 1)
+                                        + ")").focus();
+                    }
+                }
+            });
+    if($( ".showCalIcon:enabled" ).length != 0){
+    	$( ".showCalIcon:enabled" ).datepicker({
+            showOn : "button"
+                , buttonImage : "/com/img/icon_calendar.gif"
+                , buttonImageOnly : true
+                , changeMonth: true
+                , changeYear : true
+                , dateFormat : "yy-mm-dd"
+                , beforeShow: function() {
+                    setTimeout(function(){
+                        $('.ui-datepicker').css('z-index', 99999999999999);
+                    }, 0);
+                }
+            });
+    }
+    
+    
+    if (typeof page_init == 'function') {
+    	page_init();
+    }
+});
+
+/**
+ *  form 에 숫자 입력 등 제한처리
+ */
+function fvInit(formId) {
+	if ($(formId).attr("isInit") != undefined) {
+		return;
+	}
+	$(formId).attr("isInit","Y");
+    $(formId + " :input.tNUM").unbind("keydown");
+    $(formId + " :input.tMONEY").unbind("keydown");
+    $(formId + " :input.tFMONEY").unbind("keydown");
+    $(formId + " :input.tFLOAT").unbind("keydown");
+    $(formId + " :input.tENG").unbind("keydown");
+    $(formId + " :input.tENGNUM").unbind("keydown");
+
+	$(document).on("keydown", formId + " :input.tNUM",function(e) {
+		//debugger;
+	    return numberKeydownCheck(e);
+	});
+	$(document).on("keydown", formId + " :input.tMONEY",function(e) {
+	    return numberKeydownCheck(e);
+	});
+	$(document).on("keydown", formId + " :input.tFMONEY",function(e) {
+	    return floatKeydownCheck(e);
+	});
+	$(document).on("keydown", formId + " :input.tFLOAT",function(e) {
+	    return floatKeydownCheck(e);
+	});
+	$(document).on("keydown", formId + " :input.tENG",function(e) {
+	    return engKeydownCheck(e);
+	});
+	$(document).on("keydown", formId + " :input.tENGNUM",function(e) {
+	    return engNumKeydownCheck(e);
+	});
+
+	// 한글 전환이 필요없는 input 영문 고정
+	$(formId + " :input").filter(".tNUM").css("ime-mode", "disabled");
+	$(formId + " :input").filter(".tMONEY").css("ime-mode", "disabled");
+	$(formId + " :input").filter(".tFMONEY").css("ime-mode", "disabled");
+	$(formId + " :input").filter(".tFLOAT").css("ime-mode", "disabled");
+	$(formId + " :input").filter(".tEMAIL").css("ime-mode", "disabled");
+	$(formId + " :input").filter(".tENG").css("ime-mode", "disabled");
+	$(formId + " :input").filter(".tENGNUM").css("ime-mode", "disabled");
+	$(formId + " :input").filter(".tYMD").css("ime-mode", "disabled");
+	$(formId + " :input").filter(".tYMD_HH24MI").css("ime-mode", "disabled");
+}
+
+/**
+ * 특정 form validation
+ */
+function formValidate(formId, alertAct) {
+	return fv(formId, "alert", alertAct);
+}
+
+
+/**
+ * 특정 form validation
+ * formId : 검사할 form id
+ * alertGbn : 알림구분 alert(validation 오류시 alert으로 알림), allerr(form의 모든 validation 오류를 모아서 alert)
+ * alertAct : validation을 체크하되 alert으로 알리지 않고 return false 한다. => allerr
+ */
+function fv(formId, alertGbn, alertAct) {
+	if (alertGbn == undefined || alertAct == undefined) {
+		alertGbn = "alert";
+		alertAct = true;
+	}
+	if (!alertAct) {
+		alertGbn = "allerr";
+	}
+	var validationResult = true;
+	var errMsg = "";
+	var chkRadioNameList = "";
+	$(formId + " :input").each(
+        function() {
+            var title = ($(this).prop("title") == "" ? $(this).prop("name") : $(this).prop("title"));
+            var val = $(this).val();
+            var removeFormatVal = val;
+            if ($(this).hasClass("tYMD") && val != "") {
+            	removeFormatVal = val.replace(/-/gi,'');
+            } else if ($(this).hasClass("tYMD_HH24MI") && val != "") {
+            	removeFormatVal = val.replace(/[-|:| ]/g, '');
+            } else if (($(this).hasClass("tMONEY") || $(this).hasClass("tNUM")) && val != "") {
+            	removeFormatVal = val.replace(/,/g, '');
+            } else if (($(this).hasClass("tFMONEY") || $(this).hasClass("tFLOAT")) && val != "") {
+            	removeFormatVal = val.replace(/,/g, '');
+            }
+            var maxByteLen = ($(this).attr("maxlength_byte") == undefined ? "" : $(this).attr("maxlength_byte"));
+            var minByteLen = ($(this).attr("minlength_byte") == undefined ? "" : $(this).attr("minlength_byte"));
+            var maxLen = ($(this).attr("maxlength") == undefined ? "" : $(this).attr("maxlength"));
+            var minLen = ($(this).attr("minlength") == undefined ? "" : $(this).attr("minlength"));
+            
+            if ($(this).hasClass("required") && ($(this).attr("disabled") == undefined || $(this).attr("disabled") == false)) {
+                if (($(this).prop("type") == "text" || $(this).prop("type") == "password" || $(this).prop("type") == "textarea" || $(this).prop("type") == "file" || $(this).prop("type") == "number") && $(this).val() == "") {
+                    if (alertGbn == "alert") {
+                        messageBox.alert(title + "을(를) 입력하여 주십시오.");
+                        $(this).focus();
+                        validationResult = false;
+                        return false;
+                    } else if (alertGbn == "allerr") {
+                        errMsg += title + "을(를) 입력하여 주십시오." + "\n";
+                    }
+                } else if ($(this).get(0).tagName == "SELECT" && val == "") {
+                    if (alertGbn == "alert") {
+                        $(this).focus();
+                        messageBox.alert(title + "을(를) 선택하여 주십시오.");
+                        validationResult = false;
+                        return false;
+                    } else if (alertGbn == "allerr") {
+                        errMsg += title + "을(를) 선택하여 주십시오." + "\n";
+                    }
+                } else if (($(this).prop("type") == "radio" || $(this).prop("type") == "checkbox") && $("input[name='" + $(this).prop("name") + "']:checked").length == 0) {
+                    if (alertGbn == "alert") {
+                        $(this).focus();
+                        messageBox.alert(title + "을(를) 선택하여 주십시오.");
+                        validationResult = false;
+                        return false;
+                    } else if (alertGbn == "allerr") {
+                        if (chkRadioNameList.indexOf($(this).prop("name")
+                                + ",") < 0) {
+                            errMsg += title + "을(를) 선택하여 주십시오" + "\n";
+                            chkRadioNameList += $(this).prop("name") + ",";
+                        }
+                    }
+                }
+            }
+            if (minLen != "" && removeFormatVal.length < minLen) {
+            	if (alertGbn == "alert") {
+                    $(this).focus();
+                    messageBox.alert(title + " 은(는) "+minLen+"자 이상으로 입력하셔야 합니다. 입력글자수("+val.length+")\n");
+                    validationResult = false;
+                    return false;
+                } else if (alertGbn == "allerr") {
+                    errMsg += title + " 은(는) "+minLen+"자(byte) 이상으로 입력하셔야 합니다. 입력글자수("+val.length+")\n";
+                }
+            }
+            if (maxLen != "" && removeFormatVal.length > maxLen) {
+            	if (alertGbn == "alert") {
+                    $(this).focus();
+                    messageBox.alert(title + " 은(는) "+maxLen+"자 이하로 입력하셔야 합니다. 입력글자수("+val.length+")\n");
+                    validationResult = false;
+                    return false;
+                } else if (alertGbn == "allerr") {
+                    errMsg += title + " 은(는) "+maxLen+"자 이하로 입력하셔야 합니다. 입력글자수("+val.length+")\n";
+                }
+            }
+            if (minByteLen != "" && val.byte() < minByteLen) {
+            	if (alertGbn == "alert") {
+                    $(this).focus();
+                    messageBox.alert(title + " 은(는) "+minByteLen+"자(byte) 이상으로 입력하셔야 합니다. 입력글자수("+val.byte()+"Byte)\n");
+                    validationResult = false;
+                    return false;
+                } else if (alertGbn == "allerr") {
+                    errMsg += title + " 은(는) "+minByteLen+"자(byte) 이상으로 입력하셔야 합니다. 입력글자수("+val.byte()+"Byte)\n";
+                }
+            }
+            
+            if (maxByteLen != "" && val.byte() > maxByteLen) {
+            	if (alertGbn == "alert") {
+                    $(this).focus();
+                    messageBox.alert(title + " 은(는) "+maxByteLen+"자 이하로 입력하셔야 합니다. 입력글자수("+val.byte()+"Byte)\n");
+                    validationResult = false;
+                    return false;
+                } else if (alertGbn == "allerr") {
+                    errMsg += title + " 은(는) "+maxByteLen+"자 이하로 입력하셔야 합니다. 입력글자수("+val.byte()+"Byte)\n";
+                }
+            }
+            if ($(this).hasClass("tYMD") && val != "" && val.isYmd() == false) {
+                if (alertGbn == "alert") {
+                    $(this).focus();
+                    messageBox.alert(title + " 입력값이 날짜 형식에 맞지 않습니다.\n");
+                    validationResult = false;
+                    return false;
+                } else if (alertGbn == "allerr") {
+                    errMsg += title + " 입력값이 날짜 형식에 맞지 않습니다.\n";
+                }
+            }
+            if (($(this).hasClass("tMONEY") || $(this).hasClass("tNUM")) && val != "" && val.replace(/,/g, '').isNum() == false) {
+                if (alertGbn == "alert") {
+                    $(this).focus();
+                    messageBox.alert(title + " 입력값은 숫자로만 입력하여 주십시오.");
+                    validationResult = false;
+                    return false;
+                } else if (alertGbn == "allerr") {
+                    errMsg += title + " 입력값은 숫자로만 입력하여 주십시오.\n";
+                }
+            }if (($(this).hasClass("tFMONEY") || $(this).hasClass("tFLOAT")) && val != "" && val.replace(/,/g, '').isFloat() == false) {
+            	val.replace(/,/g, '').isFloat();
+            	if (alertGbn == "alert") {
+            		$(this).focus();
+            		messageBox.alert(title + " 입력값은 실수로만 입력하여 주십시오.");
+            		validationResult = false;
+            		return false;
+            	} else if (alertGbn == "allerr") {
+            		errMsg += title + " 입력값은 실수로만 입력하여 주십시오.\n";
+            	}
+            }
+            if ($(this).hasClass("tENG") && val != "" && val.isEng() == false) {
+                if (alertGbn == "alert") {
+                    $(this).focus();
+                    messageBox.alert(title + " 입력값은 영문으로만 입력하여 주십시오.");
+                    validationResult = false;
+                    return false;
+                } else if (alertGbn == "allerr") {
+                    errMsg += title + " 입력값은 영문으로만 입력하여 주십시오.\n";
+                }
+            }
+            if ($(this).hasClass("tENGNUM") && val != "" && val.isEngNum() == false) {
+                if (alertGbn == "alert") {
+                    $(this).focus();
+                    messageBox.alert(title + " 입력값은 영문/숫자로만 입력하여 주십시오.");
+                    validationResult = false;
+                    return false;
+                } else if (alertGbn == "allerr") {
+                    errMsg += title + " 입력값은 영문/숫자로만 입력하여 주십시오.\n";
+                }
+            }
+            if ($(this).hasClass("tEMAIL") && val != "" && val.isEmail() == false) {
+                if (alertGbn == "alert") {
+                    $(this).focus();
+                    messageBox.alert(title + " 입력값이 이메일 형식에 맞지 않습니다." + "\n");
+                    validationResult = false;
+                    return false;
+                } else if (alertGbn == "allerr") {
+                    errMsg += title + " 입력값이 이메일 형식에 맞지 않습니다." + "\n";
+                }
+            }
+            
+            /**2020-08-28 추가 start **/
+            
+            var maxVarchar2Len = ($(this).attr("max_len_varchar2") == undefined ? "" : $(this).attr("max_len_varchar2"));
+            
+            if (maxVarchar2Len != "" ) {
+            	
+            	/** db varchar2 max length **/
+            	var max_db_bytes = 32767;
+            	
+            	//var thiLen = getByteLength(val);
+            	//var varchar2_length = 3;
+            	var hanByte = ($(this).attr("han_Byte") == undefined ? "3" : $(this).attr("han_Byte"));
+            	
+            	if( gfnIsNull(hanByte) || !gfn_isNumber(hanByte) ){
+            		hanByte = 3;
+            	}else if( parseInt(hanByte) > 3 || parseInt(2) < 2 ){
+            		hanByte = 3;
+            	}else{
+            		hanByte = parseInt(hanByte);
+            	}
+            	
+            	var thiLen = getByteLenOpt(val,{hLen:hanByte});
+            	
+            	//입력글자 byte가 4000 byte 초과인경우 
+            	if(thiLen > max_db_bytes)
+            	{            	
+	            	if( thiLen > maxVarchar2Len){
+	            		if (alertGbn == "alert") {
+	                        $(this).focus();
+	                        //messageBox.alert(title + " 은(는) "+maxVarchar2Len+"(Byte) 이하로 입력하셔야 합니다. 입력글자수("+thiLen+"Byte)\n");                        
+	                        var msgStr = title + " 은(는) "+maxVarchar2Len+"자 이하 , "+max_db_bytes+" Byte 이하로 입력하셔야 합니다. "
+	                        		   + "<hr>입력글자 : "+val.length+" 자 , "+thiLen+"Byte"
+	                        		   + "<hr>"
+	                        		   + "영문 : 1 byte <br>한글 : "+hanByte+" byte<br>"
+	                        		   + "특수문자: \"&\" (5 byte ) , \"<\" (4 byte ) , \">\" (4 byte ) , \" \" \" (6 byte ) , \" ' \" (6 byte ) ";                        
+	                        messageBox.alert(msgStr);
+	                        validationResult = false;
+	                        return false;
+	                    } else if (alertGbn == "allerr") {
+	                        errMsg += title + " 은(는) "+maxVarchar2Len+"(Byte) 이하로 입력하셔야 합니다. 입력글자 byte("+thiLen+"Byte)\n";
+	                    }
+	            	}	            	
+            	}
+            	//입력글자 byte가 4000 byte 이하인경우
+            	else
+            	{
+            		if(removeFormatVal.length > maxVarchar2Len)
+            		{
+            			if (alertGbn == "alert") {
+                            $(this).focus();
+                            messageBox.alert(title + " 은(는) "+maxVarchar2Len+"자 이하로 입력하셔야 합니다. 입력글자수("+val.length+")\n");
+                            validationResult = false;
+                            return false;
+                        } else if (alertGbn == "allerr") {
+                            errMsg += title + " 은(는) "+maxVarchar2Len+"자 이하로 입력하셔야 합니다. 입력글자수("+val.length+")\n";
+                        }
+            		}
+            	}
+            }
+            
+            /**2020-08-28 추가 end **/
+            
+        });
+	if (alertGbn == "alert") {
+	    return validationResult;
+	} else if (alertGbn == "allerr") {
+	    return errMsg;
+	} else {
+	    return "";
+	}
+}
+
+
+function fCheckLen(formId, alertGbn, alertAct) {
+	
+	if (alertGbn == undefined || alertAct == undefined) {
+		alertGbn = "alert";
+		alertAct = true;
+	}
+	if (!alertAct) {
+		alertGbn = "allerr";
+	}
+	
+	var validationResult = true;
+	var errMsg = "";
+	var chkRadioNameList = "";
+	$(formId + " :input").each(			
+	    function() {
+	    	
+	    	if(!gfnIsNull($(this).val())){
+	        
+		    	var title = ($(this).prop("title") == "" ? $(this).prop("name") : $(this).prop("title"));
+		        var val = $(this).val();
+		        var removeFormatVal = val;
+		        if ($(this).hasClass("tYMD") && val != "") {
+		        	removeFormatVal = val.replace(/-/gi,'');
+		        } else if ($(this).hasClass("tYMD_HH24MI") && val != "") {
+		        	removeFormatVal = val.replace(/[-|:| ]/g, '');
+		        } else if (($(this).hasClass("tMONEY") || $(this).hasClass("tNUM")) && val != "") {
+		        	removeFormatVal = val.replace(/,/g, '');
+		        } else if (($(this).hasClass("tFMONEY") || $(this).hasClass("tFLOAT")) && val != "") {
+		        	removeFormatVal = val.replace(/,/g, '');
+		        }
+		        var maxByteLen = ($(this).attr("maxlength_byte") == undefined ? "" : $(this).attr("maxlength_byte"));
+		        var minByteLen = ($(this).attr("minlength_byte") == undefined ? "" : $(this).attr("minlength_byte"));
+		        var maxLen = ($(this).attr("maxlength") == undefined ? "" : $(this).attr("maxlength"));
+		        var minLen = ($(this).attr("minlength") == undefined ? "" : $(this).attr("minlength"));
+		        var maxVarchar2Len = ($(this).attr("max_len_varchar2") == undefined ? "" : $(this).attr("max_len_varchar2"));
+	        
+		        if (minLen != "" && removeFormatVal.length < minLen) {
+		        	if (alertGbn == "alert") {
+		                $(this).focus();
+		                messageBox.alert(title + " 은(는) "+minLen+"자 이상으로 입력하셔야 합니다. 입력글자수("+val.length+")\n");
+		                validationResult = false;
+		                return false;
+		            } else if (alertGbn == "allerr") {
+		                errMsg += title + " 은(는) "+minLen+"자(byte) 이상으로 입력하셔야 합니다. 입력글자수("+val.length+")\n";
+		            }
+		        }
+		        if (maxLen != "" && removeFormatVal.length > maxLen) {
+		        	if (alertGbn == "alert") {
+		                $(this).focus();
+		                messageBox.alert(title + " 은(는) "+maxLen+"자 이하로 입력하셔야 합니다. 입력글자수("+val.length+")\n");
+		                validationResult = false;
+		                return false;
+		            } else if (alertGbn == "allerr") {
+		                errMsg += title + " 은(는) "+maxLen+"자 이하로 입력하셔야 합니다. 입력글자수("+val.length+")\n";
+		            }
+		        }
+		        if (minByteLen != "" && val.byte() < minByteLen) {
+		        	if (alertGbn == "alert") {
+		                $(this).focus();
+		                messageBox.alert(title + " 은(는) "+minByteLen+"자(byte) 이상으로 입력하셔야 합니다. 입력글자수("+val.byte()+"Byte)\n");
+		                validationResult = false;
+		                return false;
+		            } else if (alertGbn == "allerr") {
+		                errMsg += title + " 은(는) "+minByteLen+"자(byte) 이상으로 입력하셔야 합니다. 입력글자수("+val.byte()+"Byte)\n";
+		            }
+		        }
+		        
+		        if (maxByteLen != "" && val.byte() > maxByteLen) {
+		        	if (alertGbn == "alert") {
+		                $(this).focus();
+		                messageBox.alert(title + " 은(는) "+maxByteLen+"자 이하로 입력하셔야 합니다. 입력글자수("+val.byte()+"Byte)\n");
+		                validationResult = false;
+		                return false;
+		            } else if (alertGbn == "allerr") {
+		                errMsg += title + " 은(는) "+maxByteLen+"자 이하로 입력하셔야 합니다. 입력글자수("+val.byte()+"Byte)\n";
+		            }
+		        }
+		        if ($(this).hasClass("tYMD") && val != "" && val.isYmd() == false) {
+		            if (alertGbn == "alert") {
+		                $(this).focus();
+		                messageBox.alert(title + " 입력값이 날짜 형식에 맞지 않습니다.\n");
+		                validationResult = false;
+		                return false;
+		            } else if (alertGbn == "allerr") {
+		                errMsg += title + " 입력값이 날짜 형식에 맞지 않습니다.\n";
+		            }
+		        }
+		        if (($(this).hasClass("tMONEY") || $(this).hasClass("tNUM")) && val != "" && val.replace(/,/g, '').isNum() == false) {
+		            if (alertGbn == "alert") {
+		                $(this).focus();
+		                messageBox.alert(title + " 입력값은 숫자로만 입력하여 주십시오.");
+		                validationResult = false;
+		                return false;
+		            } else if (alertGbn == "allerr") {
+		                errMsg += title + " 입력값은 숫자로만 입력하여 주십시오.\n";
+		            }
+		        }if (($(this).hasClass("tFMONEY") || $(this).hasClass("tFLOAT")) && val != "" && val.replace(/,/g, '').isFloat() == false) {
+		        	val.replace(/,/g, '').isFloat();
+		        	if (alertGbn == "alert") {
+		        		$(this).focus();
+		        		messageBox.alert(title + " 입력값은 실수로만 입력하여 주십시오.");
+		        		validationResult = false;
+		        		return false;
+		        	} else if (alertGbn == "allerr") {
+		        		errMsg += title + " 입력값은 실수로만 입력하여 주십시오.\n";
+		        	}
+		        }
+		        if ($(this).hasClass("tENG") && val != "" && val.isEng() == false) {
+		            if (alertGbn == "alert") {
+		                $(this).focus();
+		                messageBox.alert(title + " 입력값은 영문으로만 입력하여 주십시오.");
+		                validationResult = false;
+		                return false;
+		            } else if (alertGbn == "allerr") {
+		                errMsg += title + " 입력값은 영문으로만 입력하여 주십시오.\n";
+		            }
+		        }
+		        if ($(this).hasClass("tENGNUM") && val != "" && val.isEngNum() == false) {
+		            if (alertGbn == "alert") {
+		                $(this).focus();
+		                messageBox.alert(title + " 입력값은 영문/숫자로만 입력하여 주십시오.");
+		                validationResult = false;
+		                return false;
+		            } else if (alertGbn == "allerr") {
+		                errMsg += title + " 입력값은 영문/숫자로만 입력하여 주십시오.\n";
+		            }
+		        }
+		        if ($(this).hasClass("tEMAIL") && val != "" && val.isEmail() == false) {
+		            if (alertGbn == "alert") {
+		                $(this).focus();
+		                messageBox.alert(title + " 입력값이 이메일 형식에 맞지 않습니다." + "\n");
+		                validationResult = false;
+		                return false;
+		            } else if (alertGbn == "allerr") {
+		                errMsg += title + " 입력값이 이메일 형식에 맞지 않습니다." + "\n";
+		            }
+		        }
+	        
+		        if (maxVarchar2Len != "" ) {
+		        	/** db varchar2 max length **/
+	            	var max_db_bytes = 32767;
+	            	
+		        	//var varchar2_length = 3;
+		        	var hanByte = ($(this).attr("han_Byte") == undefined ? "3" : $(this).attr("han_Byte"));
+	            	
+	            	if( gfnIsNull(hanByte) || !gfn_isNumber(hanByte) ){
+	            		hanByte = 3;
+	            	}else if( parseInt(hanByte) > 3 || parseInt(2) < 2 ){
+	            		hanByte = 3;
+	            	}else{
+	            		hanByte = parseInt(hanByte);
+	            	}
+		        	var thiLen = getByteLenOpt(val,{hLen:hanByte});
+		        	
+		        	//입력글자 byte가 4000 byte 초과인경우 
+		        	if(thiLen > max_db_bytes)
+		        	{            	
+			        	if( thiLen > maxVarchar2Len){
+			        		if (alertGbn == "alert") {
+			                    $(this).focus();
+			                    //messageBox.alert(title + " 은(는) "+maxVarchar2Len+"(Byte) 이하로 입력하셔야 합니다. 입력글자수("+thiLen+"Byte)\n");                        
+			                    var msgStr = title + " 은(는) "+maxVarchar2Len+"자 이하 , "+max_db_bytes+" Byte 이하로 입력하셔야 합니다. "
+			                    		   + "<hr>입력글자 : "+val.length+" 자 , "+thiLen+"Byte"
+			                    		   + "<hr>"
+			                    		   + "영문 : 1 byte <br>한글 : "+hanByte+" byte<br>"
+			                    		   + "특수문자: \"&\" (5 byte ) , \"<\" (4 byte ) , \">\" (4 byte ) , \" \" \" (6 byte ) , \" ' \" (6 byte ) ";                        
+			                    messageBox.alert(msgStr);
+			                    validationResult = false;
+			                    return false;
+			                } else if (alertGbn == "allerr") {
+			                    errMsg += title + " 은(는) "+maxVarchar2Len+"(Byte) 이하로 입력하셔야 합니다. 입력글자 byte("+thiLen+"Byte)\n";
+			                }
+			        	}	            	
+		        	}
+		        	//입력글자 byte가 4000 byte 이하인경우
+		        	else
+		        	{
+		        		if(removeFormatVal.length > maxVarchar2Len)
+		        		{
+		        			if (alertGbn == "alert") {
+		                        $(this).focus();
+		                        messageBox.alert(title + " 은(는) "+maxVarchar2Len+"자 이하로 입력하셔야 합니다. 입력글자수("+val.length+")\n");
+		                        validationResult = false;
+		                        return false;
+		                    } else if (alertGbn == "allerr") {
+		                        errMsg += title + " 은(는) "+maxVarchar2Len+"자 이하로 입력하셔야 합니다. 입력글자수("+val.length+")\n";
+		                    }
+		        		}
+		        	}
+		        }
+	    	}
+		}
+	);
+		
+	if (alertGbn == "alert") {
+	    return validationResult;
+	} else if (alertGbn == "allerr") {
+	    return errMsg;
+	} else {
+	    return "";
+	}
+}
+
+
+function ajaxReplaceForm(callUrl, formId, layerId, successFunc, errFunc, completeFunc) {
+	removeMask(formId);
+	ajaxReplace(callUrl, $(formId ).serialize(), layerId, successFunc, errFunc, function(data) {
+		formatMask(formId);
+		if (completeFunc) {
+            completeFunc();
+        }
+	});
+}
+
+/**
+* ajax를 통해 서버 처리 후 특정 레이어에 replace ex) ajaxReplace("xx.do","a=1&b=2","#divId", function suc() {}, function err() {}, function comp() {});
+*  1. callUrl ajax call 처리할 서버 주소
+*  2. 전달 매개변수
+*  3. html내용을 변경할 layerId,
+*  4. 성공시 처리가 필요한 추가 function(생략가능)
+*
+*  5. 실패시 처리가 필요한 추가 function (생략가능)
+*  6. 전체 완료시 처리가 필요한 추가 function (생략가능)
+*/
+function ajaxReplace(callUrl, jsonData, layerId, successFunc, errFunc, completeFunc) {
+
+	if (getType(jsonData) == "object") {
+	    jsonData.jdcid = (new Date()).getTime();
+	    jsonData.ajax_yn = "Y";
+	} else if (getType(jsonData) == "string") {
+	    jsonData += "&jdcid=" + (new Date()).getTime() + "&ajax_yn=Y";
+	}
+
+	$(layerId).html("<div style='text-align:center;'><img src='/com/img/loading.gif'></div>");
+
+	$.ajax({
+	    url : callUrl,
+	    data : jsonData,
+	    contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+	    type : 'POST',
+
+	    success : function(data) {
+	        $(layerId).html(data);
+	        appendHtmlAfterWork(layerId);
+	        if (successFunc) {
+	            successFunc();
+	        }
+	        if (typeof sessionTimeRefresh != "undefined") {
+	            sessionTimeRefresh();
+	        }
+	    },
+	    error : function(error){
+	        if(error.status == "999"){
+	            alert("해당 계정은 조회만 가능합니다.");
+	        }else{
+	            if(errFunc == null) alert("에러");
+	        }
+	        
+	        if (errFunc) {	errFunc(); }
+	    },
+	    complete : function(data) {
+	        if (completeFunc) {
+	            completeFunc();
+	        }
+	        if (typeof sessionTimeRefresh != "undefined") {
+	            sessionTimeRefresh();
+	        }
+	    }
+	});
+}
+
+/**
+ * html append 처리 후 작업 처리
+ */
+function appendHtmlAfterWork(layerId) {
+	appendHtmlAfterWorkObj($(layerId));
+}
+
+
+/**
+ * html append 처리 후 작업 처리
+ */
+function appendHtmlAfterWorkObj(jqueryObj) {
+	jqueryObj.find(".tYMD").blur(function() {
+	    $(this).val($(this).val().getFormatVal("YMD"));
+	});
+	jqueryObj.find(".tYMD").focus(function() {
+	    $(this).val($(this).val().replaceAll("-", ""));
+	    $(this).select();
+	});
+	// $(".required").css("background-color", getItemColor('required'));
+	// CSS로 처리하기 때문에 삭제하였습니다. [담당자 : 이상혁 / 수정일자 : 2018-11-02]
+/*	$( ".showCalIcon:enabled" ).datepicker({
+	    showOn : "button"
+	        , buttonImage : "/com/img/icon_calendar.gif"
+	        , buttonImageOnly : true
+            , changeMonth: true
+            , changeYear : true
+	        , dateFormat : "yy-mm-dd"
+	        , beforeShow: function() {
+	            setTimeout(function(){
+	                $('.ui-datepicker').css('z-index', 99999999999999);
+	            }, 0);
+	        }
+	    });*/
+
+	$(".showCalIcon:enabled").datepicker({
+	    showOn : "button"
+	        , buttonImage : "/com/images/common/icon_calendar.gif"
+	        , buttonImageOnly : true
+	        , dateFormat : "yy-mm-dd"
+	        , beforeShow: function() {
+	            setTimeout(function(){
+	                $('.ui-datepicker').css('z-index', 99999999999999);
+	            }, 0);
+	        }
+	    });
+}
+
+/**
+ * callurl 로 jsonData를 post로 전송하고 결과를 json으로 받음 비동기 처리
+*  1. callUrl ajax call 처리할 서버 주소
+*  2. jsonData 전달 매개변수
+*  3. 성공시 처리가 필요한 추가 function(생략가능)
+*  4. 실패시 처리가 필요한 추가 function (생략가능)
+*  5. 전체 완료시 처리가 필요한 추가 function (생략가능)
+*  6. 통신 전 처리가 필요한 추가 function (생략가능)
+*/
+function ajaxJson(callurl, jsonData, successFunc, errFunc, completeFunc, beforeSendFunc) {
+	if (callurl.indexOf("rtn_json") < 0) {
+		if (callurl.indexOf("?") < 0) {
+			callurl += "?rtn_json=Y";
+		} else {
+			callurl += "&rtn_json=Y";
+		}
+	}
+	$.ajax({
+	    url : callurl,
+	    data : jsonData,
+	    async : true,
+	    dataType : "json",
+	    contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+	    type : 'POST',
+
+	    success : function(data) {
+	        if (successFunc) {
+	            successFunc(data);
+	        }
+	        if (typeof sessionTimeRefresh != "undefined") {
+	            sessionTimeRefresh();
+	        }
+	    },
+	    error : function(error){
+	    	console.log("error ajaxJson:" + error);
+	        if(error.status == "999"){
+	            alert("해당 계정은 조회만 가능합니다.");
+	        }else{
+	            if(errFunc == null) alert("에러");
+	        }
+	        
+	        if (errFunc) {	errFunc(error); }
+	    },
+	    beforeSend : function(data) {
+	    	if (beforeSendFunc) {
+	    		beforeSendFunc(data);
+	        }
+	    },
+	    complete : function(data) {
+	        if (completeFunc) {
+	            completeFunc(data);
+	        }
+	        if (typeof sessionTimeRefresh != "undefined") {
+	            sessionTimeRefresh();
+	        }
+	    }
+	});
+}
+
+/**
+ * callurl 로 jsonData를 post로 전송하고 결과를 json으로 받음 구글에서 동기 처리는 추후 없어질 예정 가능하면 사용하지 않도록
+*  1. callUrl ajax call 처리할 서버 주소
+*  2. jsonData 전달 매개변수
+*  3. 성공시 처리가 필요한 추가 function(생략가능)
+*  4. 실패시 처리가 필요한 추가 function (생략가능)
+*  5. 전체 완료시 처리가 필요한 추가 function (생략가능)
+*/
+function ajaxJsonSync(callurl, jsonData, successFunc, errFunc, completeFunc) {
+	if (callurl.indexOf("rtn_json") < 0) {
+		if (callurl.indexOf("?") < 0) {
+			callurl += "?rtn_json=Y";
+		} else {
+			callurl += "&rtn_json=Y";
+		}
+	}
+	$.ajax({
+	    url : callurl,
+	    data : jsonData,
+	    async : false,
+	    dataType : "json",
+	    contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+	    type : 'POST',
+
+	    success : function(data) {
+	        if (successFunc) {
+	            successFunc(data);
+	        }
+	        if (typeof sessionTimeRefresh != "undefined") {
+	            sessionTimeRefresh();
+	        }
+	    },
+	    error : function(error){
+	    	console.log("error ajaxJson:" + error);
+	        if(error.status == "999"){
+	            alert("해당 계정은 조회만 가능합니다.");
+	        }else{
+	            if(errFunc == null) alert("에러");
+	        }
+	        
+	        if (errFunc) {	errFunc(error); }
+	    },
+	    complete : function(data) {
+	        if (completeFunc) {
+	            completeFunc(data);
+	        }
+	        if (typeof sessionTimeRefresh != "undefined") {
+	            sessionTimeRefresh();
+	        }
+	    }
+	});
+}
+
+/**
+ * form 자료 ajax submit 처리
+ */
+function ajaxSubmitForm(submitUrl, formId, successFunc, errFunc) {
+	if ($(formId).find("input[name=rtn_json]").length == 0) {
+		$(formId).append("<input type='hidden' name='rtn_json' value='Y'/>");
+	} else {
+		$(formId).find("input[name=rtn_json]").val("Y");
+	}
+	removeMask(formId);
+	$(formId).ajaxForm({
+	    url : submitUrl,
+	    dataType : "json",
+	    error : function(error){
+			    	if(error.status == "999"){
+		                alert("해당 계정은 조회만 가능합니다.");
+		            }else{
+		            	if(errFunc == null) alert("에러");
+		            }
+			    	
+			    	if (errFunc) {	errFunc(); }
+	    },
+	    success : function(responseJson){
+	            if (successFunc) {
+	            successFunc(responseJson);
+	        }
+	    },
+	    complete : function(responseJson){
+	    	$(formId).find("input[name=rtn_json]").val("N");
+	    	formatMask(formId);
+        }
+	});
+
+	$(formId).submit() ;
+}
+
+/**
+ * multipart form 자료 ajax submit 처리
+ */
+function ajaxSubmitMultipartForm(submitUrl, formId, successFunc, errFunc) {
+	if (callurl.indexOf("rtn_json") < 0) {
+		if (callurl.indexOf("?") < 0) {
+			callurl += "?rtn_json=Y";
+		} else {
+			callurl += "&rtn_json=Y";
+		}
+	}
+	removeMask(formId);
+	$(formId).ajaxForm({
+	    url : submitUrl,
+	    enctype : "multipart/form-data",
+	    dataType : "json",
+	    error : function(error){
+	        if(error.status == "999"){
+	            alert("해당 계정은 조회만 가능합니다.");
+	        }else{
+	            if(errFunc == null) alert("에러");
+	        }
+	        
+	        if (errFunc) {	errFunc(); }
+	    },
+	    success : function(responseJson){
+	            if (successFunc) {
+	            successFunc(responseJson);
+	        }
+	    },
+	    complete : function(responseJson){
+	    	formatMask(formId);
+        }
+	});
+
+	$(formId).submit() ;
+}
+
+/**
+ * callurl 호출후 반환되는 data의 내용이 json 으로 해석되지 않는것만 제외하고는 위의 ajaxJson과 모두 동일함
+ */
+function ajaxData(callurl, jsonData, successFunc, errFunc, completeFunc) {
+	$.ajax({
+	    url : callurl,
+	    data : jsonData,
+	    async : true,
+	    contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+	    type : 'POST',
+
+	    success : function(data) {
+	        if (successFunc) {
+	            successFunc(data);
+	        }
+	    },
+	    error : function(error){
+	        if(error.status == "999"){
+	            alert("해당 계정은 조회만 가능합니다.");
+	        }else{
+	            if(errFunc == null) alert("에러");
+	        }
+	        
+	        if (errFunc) {	errFunc(); }
+	    },
+	    complete : function(data) {
+	        if (completeFunc) {
+	            completeFunc(data);
+	        }
+	    }
+	});
+}
+
+
+/**
+ * callurl 호출후 반환되는 data의 내용이 json 으로 해석되지 않는것만 제외하고는 위의 ajaxJson과 모두 동일함
+ */
+function ajaxFileData(callurl, data, successFunc, errFunc, completeFunc) {
+    $.ajax({
+        url : callurl,
+        data : data,
+        processData: false,
+        contentType : false,
+        type : 'POST',
+
+        success : function(data) {
+            if (successFunc) {
+                successFunc(data);
+            }
+        },
+        error : function(error){
+            if(error.status == "999"){
+                alert("해당 계정은 조회만 가능합니다.");
+            }else{
+                if(errFunc == null) alert("에러");
+            }
+
+            if (errFunc) {	errFunc(); }
+        },
+        complete : function(data) {
+            if (completeFunc) {
+                completeFunc(data);
+            }
+        }
+    });
+}
+
+/**
+ * 기본 토스트 팝업
+ */
+function toastPop1(msg) {
+	$.toast({
+	    heading : '알림',
+	    text : msg,
+	    position : 'mid-center',
+	    stack : 4,
+	    hideAfter : 1000
+	});
+}
+
+/**
+ *  화면(Table)의 내용을 excel파일로 다운로드
+ */
+function screenToExcel(id, titleNm, fileNm) {
+	if (fileNm == undefined || fileNm == "") {
+	    fileNm = titleNm + ".xls";
+	}
+	$(id).table2excel({
+	    exclude : ".noExl",
+	    exclude_links : true,
+		exclude_img: true,
+		exclude_links: true,
+        exclude_selects: true,
+	    name : titleNm,
+	    filename : fileNm
+	});
+}
+
+/**
+ * 프로시져 호출해서 콤보상자 생성
+ */
+function setOptionByProc(prActionNm, optId, defVal, param01, param02, param03,
+    param04, param05, topRow, afterFunc) {
+
+    ajaxJsonSync(
+        "/com/codeListAjax.do",
+        {
+            "pr_action_nm" : prActionNm,
+            "param01" : param01,
+            "param02" : param02,
+            "param03" : param03,
+            "param04" : param04,
+            "param05" : param05
+        },
+        function(data) {
+
+            $(optId + " option").remove();
+            if (topRow != "") {
+                $(optId).append("<option value=''>" + topRow + "</option>");
+            }
+            for (var i = 0; i < data.codeList.length; i++) {
+                $(optId)
+                        .append(
+                                "<option value='"
+                                        + data.codeList[i].code
+                                        + "'"
+                                        + (data.codeList[i].code == defVal ? "selected='selected'"
+                                                : "") + ">"
+                                        + data.codeList[i].data
+                                        + "</option>");
+            }
+
+            if (afterFunc != undefined) {
+                afterFunc();
+            }
+        });
+}
+
+/**
+ * keydown 체크 숫자
+ */
+function numberKeydownCheck(e) {
+	var key = e.charCode || e.keyCode || 0;
+	return (key == 8 || key == 9 || key == 13 || key == 35 || key == 36
+	        || key == 46 || (key >= 35 && key <= 40)
+	        || (key >= 48 && key <= 57 && e.shiftKey == false) || (key >= 96 && key <= 105) || key == 109 || key == 110 );
+}
+
+
+/**
+ * keydown 체크 실수형
+ */
+function floatKeydownCheck(e) {
+	var key = e.charCode || e.keyCode || 0;
+	return (key == 8 || key == 9 || key == 13 || key == 35 || key == 36
+	        || key == 46 || (key >= 35 && key <= 40)
+	        || (key >= 48 && key <= 57 && e.shiftKey == false)
+	        || (key >= 96 && key <= 105) || (key >= 189 && key <= 190) || key == 109  || key == 110);
+}
+
+/**
+ * keydown 체크 영문/숫자
+ */
+function engNumKeydownCheck(e) {
+	var keyCd = e.charCode || e.keyCode || 0;
+	var regEx = /[0-9A-Za-z]/g;
+	var key = String.fromCharCode(e.which);
+	if (keyCd == 8 || keyCd == 9 || keyCd == 35 || keyCd == 36 || keyCd == 37
+	        || keyCd == 39 || keyCd == 46 || (keyCd >= 96 && keyCd <= 105)
+	        || regEx.test(key)) {
+	    return true;
+	} else {
+	    return false;
+	}
+}
+
+/**
+ * keydown 체크 영문
+ */
+function engKeydownCheck(e) {
+	var keyCd = e.charCode || e.keyCode || 0;
+	var englishAlphabet = /[A-Za-z]/g;
+	var key = String.fromCharCode(e.which);
+	if (keyCd == 8 || keyCd == 9 || keyCd == 35 || keyCd == 36 || keyCd == 37 || keyCd == 39 || keyCd == 46 || englishAlphabet.test(key)) {
+	    return true;
+	} else {
+	    return false;
+	}
+}
+
+/**
+ * 특정 object를 화면의 센터로 처리
+ */
+jQuery.fn.center = function() {
+	this.css("position", "absolute");
+	this.css("top", Math.max(0, (($(window).height() - $(this).outerHeight()) / 2) + $(window).scrollTop()) + "px");
+	this.css("left", Math.max(0, (($(window).width() - $(this).outerWidth()) / 2) + $(window).scrollLeft()) + "px");
+	return this;
+}
+
+/**
+ * 팝업 리사이징
+ * ex : frameControl.resize();
+ */
+var frameControl = new Object({
+        // 브라우저 체크(FF3, FF2, FF, IE, Saf, Chr, Op)
+
+        // 팝업 리사이징
+        resize : function() {
+            var winSize = this.alertSize();
+            var sizeWidth = winSize[0];
+            var sizeHeight = winSize[1];
+
+            var Dwidth = 0, Dheight = 0;
+
+            if (browser() == "IE") {
+                Dwidth = document.body.scrollWidth;
+                Dheight = document.body.scrollHeight;
+            } else {
+                Dwidth = document.compatMode == "CSS1Compat" ? document.documentElement.scrollWidth
+                        : document.body.scrollWidth;
+                Dheight = document.compatMode == "CSS1Compat" ? document.documentElement.scrollHeight
+                        : document.body.scrollHeight;
+            }
+
+            var width = Dwidth - sizeWidth;
+            var height = Dheight - sizeHeight;
+            self.resizeBy(width, height);
+        },
+
+        // 윈도우 사이즈 체크
+        alertSize : function() {
+            var myWidth = 0, myHeight = 0;
+            if (typeof (window.innerWidth) == 'number') {
+                // Non-IE
+                myWidth = window.innerWidth;
+                myHeight = window.innerHeight;
+            } else if (document.documentElement
+                    && (document.documentElement.clientWidth || document.documentElement.clientHeight)) {
+                // IE 6+ in 'standards compliant mode'
+                myWidth = document.documentElement.clientWidth;
+                myHeight = document.documentElement.clientHeight;
+            } else if (document.body
+                    && (document.body.clientWidth || document.body.clientHeight)) {
+                // IE 4 compatible
+                myWidth = document.body.clientWidth;
+                myHeight = document.body.clientHeight;
+            }
+            return [ myWidth, myHeight ];
+        }
+});
+
+var browser = function() {
+	// Return cached result if avalible, else get result then cache it.
+	if (browser.prototype._cachedResult)
+	    return browser.prototype._cachedResult;
+
+	// Opera 8.0+ (UA detection to detect Blink/v8-powered Opera)
+	var isOpera = (!!window.opr && !!opr.addons) || !!window.opera
+	        || navigator.userAgent.indexOf(' OPR/') >= 0;
+
+	// Firefox 1.0+
+	var isFirefox = typeof InstallTrigger !== 'undefined';
+
+	// At least Safari 3+: "[object HTMLElementConstructor]"
+	var isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf(
+	        'Constructor') > 0;
+
+	// Chrome 1+
+	var isChrome = !!window.chrome && !isOpera;
+
+	// At least IE6
+	var isIE = /* @cc_on!@ */false || !!document.documentMode;
+
+	// Edge 20+
+	var isEdge = !isIE && !!window.StyleMedia;
+
+	return browser.prototype._cachedResult = isOpera ? 'Opera'
+	        : isFirefox ? 'Firefox' : isSafari ? 'Safari' : isChrome ? 'Chrome'
+	                : isIE ? 'IE' : isEdge ? 'Edge' : "Don't know";
+};
+
+if (!String.prototype.endsWith) {
+	String.prototype.endsWith = function(searchString, position) {
+	    var subjectString = this.toString();
+	    if (typeof position !== 'number' || !isFinite(position)
+	            || Math.floor(position) !== position
+	            || position > subjectString.length) {
+	        position = subjectString.length;
+	    }
+	    position -= searchString.length;
+	    var lastIndex = subjectString.indexOf(searchString, position);
+	    return lastIndex !== -1 && lastIndex === position;
+	};
+}
+
+/**
+ * javascript object 의 type을 조회
+ */
+function getType(p) {
+	if (Array.isArray(p))
+	    return 'array';
+	else if (typeof p == 'string')
+	    return 'string';
+	else if (p != null && typeof p == 'object')
+	    return 'object';
+	else
+	    return 'other';
+}
+
+/**
+ * input type 의 확인
+ */
+function getIType(elim) {
+	var itype = "";
+	if (elim.className.indexOf("tENGNUM") >= 0) {
+	    itype = "ENGNUM";
+	} else if (elim.className.indexOf("tMONEY") >= 0) {
+	    itype = "MONEY";
+	} else if (elim.className.indexOf("tNUM") >= 0) {
+	    itype = "NUM";
+	} else if (elim.className.indexOf("tFMONEY") >= 0) {
+	    itype = "FMONEY";
+	} else if (elim.className.indexOf("tFLOAT") >= 0) {
+	    itype = "FLOAT";
+	} else if (elim.className.indexOf("tEMAIL") >= 0) {
+	    itype = "EMAIL";
+	} else if (elim.className.indexOf("tYMD") >= 0) {
+	    itype = "YMD";
+	} else if (elim.className.indexOf("tYMD_HH24MI") >= 0) {
+		itype = "YMD_HH24MI";
+	}
+	return itype;
+}
+
+/**
+ * inuput의 mask를 제거(천단위 포맷, 년월일)
+ */
+function removeMask(frm) {
+	$(frm).find(".tYMD").each(function() {
+	    $(this).val($(this).val().replace(/-/g, ""));
+	});
+	$(frm).find(".tYMD_HH24MI").each(function() {
+		$(this).val($(this).val().replace(/[-|:| ]/g, ""));
+	});
+	$(frm).find(".tMONEY").each(function() {
+	    $(this).val($(this).val().replace(/,/g, ""));
+	});
+	$(frm).find(".tFMONEY").each(function() {
+	    $(this).val($(this).val().replace(/,/g, ""));
+	});
+	$(frm).find(".tYM").each(function() {
+	    $(this).val($(this).val().replace(/-/g, ""));
+	});
+}
+
+/**
+ * input의 mask를 지정(천단위 포맷, 년월일)
+ */
+function formatMask(frm) {
+	$(frm).find(".tYMD").each(function() {
+	    $(this).val($(this).val().getFormatVal("YMD"));
+	});
+	$(frm).find(".tYM").each(function() {
+		$(this).val($(this).val().getFormatVal("YM"));
+	});
+	$(frm).find(".tMONEY").each(function() {
+	    $(this).val($(this).val().getFormatVal("MONEY"));
+	    $(this).css("text-align", "right");
+	});
+	$(frm).find(".tFMONEY").each(function() {
+	    $(this).val($(this).val().getFormatVal("MONEY"));
+	    $(this).css("text-align", "right");
+	});
+	$(frm).find(".tYMD_HH24MI").each(function() {
+	    $(this).val($(this).val().getFormatVal("YMD_HH24MI"));
+	});
+}
+
+/**
+ * input 의 format mask를 지정
+ */
+function formatMaskElm(ctrl) {
+	var itype = getIType(ctrl);
+	switch (itype) {
+		case "MONEY":
+		case "FMONEY":
+		    ctrl.value = ctrl.value.getFormatVal("MONEY");
+		    ctrl.style.textAlign = "right";
+		    break;
+		case "NUM":
+		case "FLOAT":
+		    ctrl.style.textAlign = "right";
+		    break;
+		case "YMD":
+		    ctrl.value = ctrl.value.getFormatVal("YMD");
+	}
+}
+
+/**
+ * 특정id가 object 인지 체크
+ */
+function isObject(object_key) {
+	try {
+	    document.all[object_key].value;
+	    return true;
+	} catch (e) {
+	    return false;
+	}
+}
+
+/**
+ * 특정 input object 의 value 조회
+ */
+function isEmpty(input) {
+	if (input.value == null || input.value.replace(/ /gi, "") == "") {
+	    return true;
+	}
+	return false;
+}
+
+/** 
+ * "" , 'null' , null , undefined 인 경우 true 반환
+ * @param str
+ */
+function gfnIsNull(str){
+	
+	var result = false;
+
+	if(str == null || str == "" || str == "null" || str == undefined || str == "undefined" ){
+		result = true;
+	}
+
+	return result;
+}
+
+
+function gfnIsEmpty(value)
+{
+	if(value == null) return true;
+	if(typeof value == 'undefined') return true;
+	if(typeof value == 'string' && value == '') return true;
+	if(Array.isArray(value) && value.length < 1) return true;
+	if(typeof value == 'object' && value.constructor.name == 'Object' && Object.keys(value).length < 1 && Object.getOwnPropertyNames(value) < 1 ) return true;
+	if(typeof value == 'object' && value.constructor.name == 'String' && Object.keys(value).length < 1 ) return true; // new String()
+
+	return false;
+}
+
+/**
+ * 값이 null인경우 default값을 반환
+ * @param val	: 값
+ * @param dfVal : 기본값
+ * @returns
+ */
+function gfnGetDfVal(val,dfVal)
+{
+	if(gfnIsNull(val))
+	{
+		dfVal = ( gfnIsNull(dfVal) ) ? "" : dfVal;
+		return dfVal;
+	}
+	else
+	{
+		return val;
+	}
+}
+
+/**
+ * radio box에 checked 값 return
+ * @param nm input radio name
+ * @returns radio value
+ */
+function gfnGetRadio(nm)
+{
+	var res = null;
+	
+	if(gfnIsNull(nm))
+	{
+		return -1;
+	}
+	else
+	{
+		
+		res = $("input:radio[name="+nm+"]:checked").val();
+	}
+	
+	return gfnGetDfVal(res,-1);
+}
+
+
+/******************************************************
+*   radio box check 하기
+*
+* objNm 	: radio name값
+* objVal	: radio value값
+* 예			: cfnCheckRadio('isRe','1');
+******************************************************/
+function cfnCheckRadio(objNm,objVal){
+	
+	if(objNm == null ){
+		objNm = "NOT_EXIST";
+	}
+
+	if(objVal == null){
+		objVal = "NOT_EXIST";
+	}
+
+	$("input:radio[name="+objNm+"]").filter("[value="+objVal+"]").prop('checked',true);
+
+}
+
+/******************************************************
+*   radio box disabled 속성 추가 삭제
+*
+* objNm 		: radio name값
+* isDisabled 	: boolean
+* 예				: cfnDisabledRadio('isRe',true);
+******************************************************/
+function cfnDisabledRadio(objNm,isDisabled){
+	
+	var radioObj = $("input:radio[name="+objNm+"]");
+
+	if(isDisabled){
+		radioObj.attr( "disabled" ,"true");
+	}else{
+		radioObj.removeAttr( "disabled" );
+	}
+}
+
+
+/******************************************************
+*   구분자로된값을 배열로 가져오기
+*
+*	valStr	: ex '01|02|03|'  예와같은 구분자로 된 값
+*   delim   : ex |  구분자
+******************************************************/
+function gfn_getArrByDelim(valStr,delim)
+{
+			
+	var val = [];
+	
+	if( valStr == null || valStr == "" )
+	{
+		return val;
+	}
+	else
+	{
+		//마지막 값이 구분자일경우 마지막 구분자 제거
+		if( valStr.substring(valStr.lastIndexOf(delim)) == delim)
+		{
+			valStr = valStr.substring(0,valStr.lastIndexOf(delim));
+		}
+		val = valStr.split(delim);
+	}
+			
+	return val;
+}
+
+/******************************************************
+*   배열안에 비교값이 있는지 여부 (true/false)
+*
+*   arrVal   : 배열 
+*   val	 	 : 비교할 값
+******************************************************/
+function gfn_existInArray(arrVal,val)
+{
+	var res = false;
+	
+	for(var i = 0 ; i < arrVal.length; i++)
+	{
+		if(arrVal[i] == val) res = true;
+	}
+	
+	return res;
+}
+
+
+/******************************************************
+*   checkbox checked
+*
+*	nm		 : checkbox name
+*   arrVal   : check 된 값의 array 
+*   isAll	 : 전체여부 ( true/false )
+******************************************************/
+function gfn_setChkBoxChecked(nm,arrVal,allNm,isAll)
+{
+	var chk_cnt = 0;
+	var ele_cnt = 0;
+	
+	if(!isAll)
+	{	
+		if(arrVal.length > 0)
+		{
+			for(var i = 0; i < arrVal.length; i++)
+			{
+				$("input:checkbox[name='"+nm+"']").each(function(){
+					ele_cnt++;
+					
+					this.checked = gfn_existInArray(arrVal,this.value);
+					
+					if(this.value == arrVal[i]) 
+					{
+						//this.checked = true;
+						chk_cnt++;
+					}
+				});
+			}
+		}
+		else
+		{
+			$("input:checkbox[name='"+nm+"']").each(function(){
+				ele_cnt++;
+				this.checked = false;
+			});
+		}
+	}
+	else
+	{
+		$("input:checkbox[name='"+nm+"']").each(function(){
+			this.checked = true;
+		});
+	}
+		
+	if( ( chk_cnt > 0 && chk_cnt == $("input:checkbox[name='"+nm+"']").length ) ||  isAll)
+	{
+		$("input:checkbox[name='" + allNm + "']").prop('checked',true);
+	}
+	else
+	{
+		$("input:checkbox[name='" + allNm + "']").prop('checked',false);
+	}
+}
+
+/******************************************************
+*   체크박스 일괄 Event
+*
+*	fname	 : form name
+*   allNm    : 일괄선택 checkbox name
+*   targetNm : 개별 checkbox name
+******************************************************/
+function gfn_setEventCheckboxAll(fname,allNm,targetNm)
+{
+	
+	if(gfnIsNull(fname)){
+		console.log("form 이름이 없습니다. - gfn_setEventCheckboxAll");
+		return;
+	}
+	
+	if(gfnIsNull(allNm)){
+		console.log("일괄선택 checkbox name이 없습니다. - gfn_setEventCheckboxAll");
+		return;
+	}
+	
+	if(gfnIsNull(targetNm)){
+		console.log("개별 checkbox name이 없습니다. - gfn_setEventCheckboxAll");
+		return;
+	}
+	
+	$("form[name='"+fname+"'] input:checkbox[name='"+allNm+"']").change(function(){
+		var isChecked = this.checked;
+		
+		$("form[name='"+fname+"'] input:checkbox[name='"+targetNm+"']").each(function(){
+			this.checked = isChecked;
+		});
+	});
+}
+
+/**
+ * 값이 null인경우 default값을 반환
+ * @param selNm	: selectbox name
+ * @param arry  : 선택값들 ex) 01|02|03|
+ * @param delim : 구분자 ex) '|'
+ */
+function gfn_setMutiSelected(selNm,arry,delim)
+{
+	if( gfnIsNull(delim) ) delim = '|';
+	
+	var selectObj 	= $("select[name=" + selNm + "] option");
+	var valueArry 	= gfn_getArrByDelim(arry,"|");
+	
+	for(var i = 0; i < selectObj.size(); i++)
+	{
+		var element = selectObj[i];
+		element.selected = gfn_existInArray(valueArry,element.value);
+	}
+}
+
+
+/******************************************************
+*   'YYYYMMDD' 를 'YYYY-MM-DD' 로
+*
+* @param str
+* @returns {String}
+******************************************************/
+function cfn_StrToDate(str){
+	var result = str.replace(/\-/g,'');
+
+	if(result.length > 8){
+		result = result.substring(0,8);
+	}
+
+	if(result.length == 8){
+		var yyyy = result.substring(0,4);
+		var mm = result.substring(4,6);
+		var dd = result.substring(6,8);
+		result = yyyy+"-"+mm+"-"+dd;
+	}else{
+		return str;
+	}
+
+	return result;
+}
+
+
+
+/******************************************************
+*   구분자 '|' 로 된값을 배열로 변환하여 반환
+*
+*	optnVal	: ex '01|02|03|'  예와같은 구분자로 된 값
+******************************************************/
+function gfn_getArrChkOpt(optnVal,delim)
+{
+	
+	if(delim == null || delim == "" || delim.length != 1 )
+	{
+		delim = "|";
+	}
+	
+	var val = [];
+	
+	if( optnVal == null || optnVal == "" )
+	{
+		return val;
+	}
+	else
+	{
+		optnVal = optnVal.substring(0,optnVal.lastIndexOf(delim));
+		val = optnVal.split(delim);
+	}
+			
+	return val;
+}
+
+/******************************************************
+*   ltrim
+******************************************************/
+function gfn_ltrim(value)
+{
+	return value.replace(/^\s+/ , "");
+}
+
+/******************************************************
+*   rtrim
+******************************************************/
+function gfn_rtrim(value)
+{
+	return value.replace(/\s+$/ , "");
+}
+
+
+/******************************************************
+*   을/를 더하여 리턴
+******************************************************/
+function gfn_addJosaStr(label){
+	var strGA = 44032;
+	var strHI = 55203;
+	
+	//label이 null , '' 이면 
+	if(gfnIsNull(label)) return "";
+	
+	var lastStrCode = label.charCodeAt(label.length-1);
+	var prop = true;
+	var msg;
+	
+	//label이 한글이 아니면
+	if( lastStrCode < strGA || lastStrCode > strHI ){
+		return gfnGetDfVal(label,"");
+	}
+	
+	if( (lastStrCode - strGA)%28 == 0 ) prop = false;
+	
+	if(prop){
+		msg = label + "을";
+	}else{
+		msg = label + "를";
+	}
+	
+	return msg;
+}
+
+/******************************************************
+*   현재날짜정보를 숫자형문자로 리턴
+******************************************************/
+function gfn_getDateNumStr(optn){
+	
+	var str = "";
+	
+	var today = new Date();
+	
+	var year 			= today.getFullYear();
+	var month 			= today.getMonth()+1;
+	var date 			= today.getDate();
+	var hours 			= today.getHours();
+	var minutes 		= today.getMinutes();
+	var seconds 		= today.getSeconds();
+	var milliseconds 	= today.getMilliseconds();
+	
+	str = year + "" + month + "" + date;
+	
+	if(optn.h) 	str = str + gfnGetDfVal(optn.delim,"") + hours;
+	if(optn.m) 	str = str + gfnGetDfVal(optn.delim,"") + minutes;
+	if(optn.s) 	str = str + gfnGetDfVal(optn.delim,"") + seconds;
+	if(optn.ms) str = str + gfnGetDfVal(optn.delim,"") + milliseconds;
+	
+	return str;
+}
+
+/**********************************************************************
+ * javascript용 map
+ *
+ * map.put(id, value) 	: map에  key,value 지정
+ * map.get(id)			: map에서 key의 value 가져오기
+ * map.contains(id)		: map에  key가 있는지 true,false
+ * map.remove(id)		: map에서 key의 value를 undefined로 지정
+ *
+ **********************************************************************/
+function gfnNewMap() {
+
+	  var map = {};
+	  map.value = {};
+
+	  map.getKey = function(id) {
+	    return "k_"+id;
+	  };
+
+	  map.put = function(id, value) {
+	    var key = map.getKey(id);
+	    map.value[key] = value;
+	  };
+
+	  map.contains = function(id) {
+	    var key = map.getKey(id);
+	    if(map.value[key]) {
+	      return true;
+	    } else {
+	      return false;
+	    }
+	  };
+
+	  map.get = function(id) {
+	    var key = map.getKey(id);
+	    if(map.value[key]) {
+	      return map.value[key];
+	    }
+	    return null;
+	  };
+
+	  map.remove = function(id) {
+	    var key = map.getKey(id);
+	    if(map.contains(id)){
+	      map.value[key] = undefined;
+	    }
+	  };
+
+	  return map;
+}
+/******************************************************
+*   해당월의 마지막날 날짜지정
+******************************************************/
+function gfnGetLastDate(year,month)
+{
+	if( gfnIsNull(year) || gfnIsNull(month) ){
+		alert("funtion gfnGetLastDate : 년도와 월을 모두 입력하세요");
+		return null;
+	}
+	else
+	{
+		if(!gfn_isNumber(year))
+		{
+			alert("funtion gfnGetLastDate : 년도를 숫자 또는 숫자형문자로 입력하세요.");
+			return null;
+		}
+		if(!gfn_isNumber(month))
+		{
+			alert("funtion gfnGetLastDate : 월을 숫자 또는 숫자형문자로 입력하세요.");
+			return null;
+		}
+		else
+		{
+			if(month == 12 || month == "12") month = "0";
+			//console.log("month="+month);
+			var lastDate =  new Date(parseInt(year),parseInt(month),0);
+			return lastDate.getDate();
+		}
+	}
+}
+
+/******************************************************
+*   숫자형확인
+******************************************************/
+function gfn_isNumber(v){
+    
+    var reg = /^(\s|\d)+$/;
+    
+    return reg.test(v);
+}
+
+/******************************************************
+*   체크박스 체크
+******************************************************/
+function gfn_setCheckbox(nm,val,chk){
+	$("input:checkbox[name='"+nm+"']").each(function(){
+		if(this.value == val) this.checked = chk;
+	});
+}
+
+/******************************************************
+*   check된 체크박스 값들 가져오기
+******************************************************/
+function gfnGetCheckValus(nm,delim)
+{
+	if(gfnIsNull(nm))
+	{
+		return "";
+	}
+	else
+	{
+		if(gfnIsNull(delim)) delim = "|";
+		
+		var values = "";
+		
+		$("input:checkbox[name='" + nm + "']").each(function(){				
+			if(this.checked) 
+			{	
+				values = values + this.value + delim;
+			}
+		});
+		
+		return values;
+	}
+}
+
+/******************************************************
+*   같은이름의 chkeckbox
+*   checked + value 를 묶음으로 하여 반환
+*   ex) 'Y01|Y02|N03|N04|Y05'
+******************************************************/
+function gfnGetCheckoxAll(nm,delim)
+{
+	if(gfnIsNull(nm))
+	{
+		return "";
+	}
+	else
+	{
+		if(gfnIsNull(delim)) delim = "|";
+		
+		var values = "";
+		
+		$("input:checkbox[name='" + nm + "']").each(function(){				
+			if(this.checked) 
+			{	
+				values = values + "Y"+this.value + delim;
+			}
+			else
+			{
+				values = values + "N"+this.value + delim;
+			}
+			
+		});
+		
+		return values;
+	}
+}
+
+
+//formId 안에 해당하는 요소들을 disabled=true, 특정 id또는 name에 대해선 disabled = false
+function switchObjectProperty(formId, array_enabled_intputId, array_enabled_intputName, array_enabled_selectName, array_enabled_buttonId, switchTrueFalse){
+
+	$('#'+formId).find('input').attr('disabled',switchTrueFalse).removeClass('required').css('background-Color','#ffffff');
+	$('#'+formId).find('select').attr('disabled',switchTrueFalse).removeClass('required').css('background-Color','#ffffff');
+	$('#'+formId).find('textarea').attr('disabled',switchTrueFalse).removeClass('required').css('background-Color','#ffffff');
+	$('#'+formId).find('button').attr('disabled',switchTrueFalse);
+	$('#'+formId).find('input:hidden').attr('disabled',false);
+	
+	if(switchTrueFalse){
+		array_enabled_intputId.forEach(function(val) {
+			$('#'+val).attr('disabled',false).addClass('required');
+		});
+		array_enabled_intputName.forEach(function(val) {
+			$('input[name='+val+']').attr('disabled',false).addClass('required');
+		});
+		array_enabled_selectName.forEach(function(val) {
+			$('select[name='+val+']').attr('disabled',false).addClass('required');
+		});
+		array_enabled_buttonId.forEach(function(val) {
+			$('#'+val).attr('disabled',false);
+		});
+	}
+}
+
+
+/**
+ * 특정 input object의 status에 따라서 input 속성 처리
+ */
+function changeObjectProperty(input, status, bool) {
+	var col_property = input.className;
+	if (status == "readonly") {
+	    input.readOnly = true;
+	    if (col_property.indexOf('required') >= 0) {
+	        input.className = col_property.replaceAll("required", "");
+	    }
+	    input.disabled = false;
+	    input.style.backgroundColor = getItemColor('readonly');
+	    if (bool == undefined || bool == true) {
+	        input.value = "";
+	    }
+	} else if (status == "writable") {
+	    input.readOnly = false;
+	    input.disabled = false;
+	    if (bool == true) {  // require 속성일 때
+		    if (col_property.indexOf('required') < 0) {
+		        input.className += " required";
+		    }
+		    input.style.backgroundColor = getItemColor('required');
+	    } else { // 일반 속성일 때
+		    if (col_property.indexOf('required') >= 0) {
+		        input.className = col_property.replaceAll("required", "");
+		    }
+	    	input.style.backgroundColor = getItemColor('regular');
+	    }
+	} else if (status == "enabled") {
+	    input.readOnly = false;
+	    if (col_property.indexOf('required') >= 0) {
+	        input.className = col_property.replaceAll("required", "");
+	    }
+	    input.disabled = false;
+	    input.style.backgroundColor = '#ffffff';
+	} else if (status == "required") {
+	    input.readOnly = false;
+	    if (col_property.indexOf('required') < 0) {
+	        input.className += " required";
+	    }
+	    input.disabled = false;
+	    input.style.backgroundColor = getItemColor('required');
+	} else if (status == "requiredOnly") {
+	    input.readOnly = true;
+	    if (col_property.indexOf('required') < 0) {
+	        input.className += " required";
+	    }
+	    input.disabled = false;
+	    input.style.backgroundColor = getItemColor('required');
+	} else if (status == "disabled") {
+	    if (bool == undefined || bool == true) {
+	    	input.disabled = true;
+	    	input.style.backgroundColor = getItemColor('readonly');	
+	    } else {
+	    	input.disabled = false;
+	    	input.style.backgroundColor = getItemColor('regular');
+	    }
+	}
+}
+
+/**
+ * 상태에 따른 컬러값 조회
+ */
+function getItemColor(status) {
+	if (status == 'required') {
+	    return "#f7efbe";
+	}
+	if (status == 'readonly') {
+	    return "#f6f6f6";
+	}
+	if (status == 'regular') {
+	    return "#ffffff";
+	}
+}
+
+/**
+ * 쿠키 셋팅
+ */
+function setCookie(name, value, expiredays) {
+	var today = new Date();
+	today.setDate(today.getDate() + expiredays);
+	document.cookie = name + "=" + escape(value) + "; path=/; expires="
+	        + today.toGMTString() + ";";
+}
+
+/**
+ * 쿠키 조회
+ */
+function getCookie(name) {
+	var nameOfCookie = name + "=";
+	var x = 0
+
+	while (x <= document.cookie.length) {
+	    var y = (x + nameOfCookie.length);
+	    if (document.cookie.substring(x, y) == nameOfCookie) {
+	        if ((endOfCookie = document.cookie.indexOf(";", y)) == -1)
+	            endOfCookie = document.cookie.length;
+	        return unescape(document.cookie.substring(y, endOfCookie));
+	    }
+	    x = document.cookie.indexOf(" ", x) + 1;
+	    if (x == 0)
+	        break;
+	}
+	return "";
+}
+
+/**
+ * 쿠키 삭제
+ */
+function DeleteCookie(name) {
+	var exp = new Date();
+	exp.setTime(exp.getTime() - 1);
+	var cval = GetCookie(name);
+	document.cookie = name + "=" + cval + "; expires=" + exp.toGMTString();
+}
+
+/**
+ * 페이지 title 동적 변경
+ */
+function htmlTitleChange(title){
+	$('title').text(title);
+}
+
+function hasCheckedRadio(input) {
+    if (input.length > 1) {
+        for (var inx = 0; inx < input.length; inx++) {
+            if (input[inx].checked) return true;
+        }
+    } else {
+        if (input.checked) return true;
+    }
+    return false;
+}
+
+function extract_filename(str, extFlag){
+	var len = str.length;
+	var last = str.lastIndexOf("\\");
+	var file = str.substring(last + 1, len);
+	if(extFlag) {
+		return file;
+	}else {
+		return file.substring(0, file.lastIndexOf("."));
+	}
+}
+
+function f_parseInt(input) {
+	return input.value == '' ? 0 : parseInt(input.value.replace(/,/g, ""));
+}
+
+
+//사업자등록번호 체크 
+function checkCorpRegNo(bizID) { 
+	var checkID = new Array(1, 3, 7, 1, 3, 7, 1, 3, 5, 1); 
+	var tmpBizID, i, chkSum=0, c2, remander; 
+	
+	for(i=0; i<=7; i++) { chkSum += checkID[i] * bizID.charAt(i); }
+ 	c2 = "0" + (checkID[8] * bizID.charAt(8)); 
+ 	c2 = c2.substring(c2.length - 2, c2.length); 
+ 	chkSum += Math.floor(c2.charAt(0)) + Math.floor(c2.charAt(1)); 
+	remander = (10 - (chkSum % 10)) % 10 ; 
+	
+	if(Math.floor(bizID.charAt(9)) == remander) return true ;
+	return false; 
+}
+
+/**
+ * tag 및 name을 이용하여 Node를 찾아 ','를 콤마태그(&#x2C;)로 변환
+ */
+function replaceComma(name,tag,childrenTag,type){
+	var special_pattern = /[,]/gi;
+	
+	if("children" == type){
+		$(tag+"[name="+name+"]").children(childrenTag).each(function(idx){
+			var str = $(this).val();
+			if( special_pattern.test(str) == true ){
+				var replaceStr = str.replace(special_pattern, '&#x2C;');
+				$(this).val(replaceStr);
+			}
+		});	
+	}else{
+		$(tag+"[name="+name+"]").each(function(idx){
+			var str = $(this).val();
+			if( special_pattern.test(str) == true ){
+				var replaceStr = str.replace(special_pattern, '&#x2C;');
+				$(this).val(replaceStr);
+			}
+		});
+	}
+}
+
+function removeNode(id) {
+	   var cNode = document.getElementById(id);
+	   cNode.parentNode.removeChild(cNode);
+}
+
+function removeNodeNo(id,no) {
+
+	   var cNode = document.getElementById("attachDocRow"+id);
+	   var cInput = document.getElementById("attach_doc"+id);
+
+	   if(no==0) {
+		   cInput.value="";
+	   } else {
+	   	   cNode.parentNode.removeChild(cNode);
+	   }
+}
+
+//특수문자 치환
+function replaceSpecial(val) {
+	return val.replace(/@NEWLINE@/g,"\n").replace(/@SQUOT@/g,"'").replace(/@QUOT@/g,"\"").replace(/@LBRACE@/g,"(").replace(/@RBRACE@/g,")");
+}
+
+/**
+ * 비밀번호 체크
+ * 조건1. 10~20 영문 대소문자
+ * 조건2. 최소 1개의 숫자 혹은 특수 문자를 포함해야 함
+ */
+function checkPassword(id,password){
+
+	if(!/^(?=.*[a-zA-Z])((?=.*\d)|(?=.*\W)).{10,20}$/.test(password)){
+		alert('숫자와 영문자 조합으로 10~20자리를 사용해야 합니다.');
+		return false;
+	}
+
+	var checkNumber = password.search(/[0-9]/g);
+	var checkEnglish = password.search(/[a-z]/ig);
+
+	if(checkNumber <0 || checkEnglish <0){
+		alert("숫자와 영문자를 혼용하여야 합니다.");
+		return false;
+	}
+	if(/(\w)\1\1\1/.test(password)){
+		alert('444같은 문자를 4번 이상 사용하실 수 없습니다.');
+		return false;
+	}
+	if(password.search(id) > -1){
+		alert("비밀번호에 아이디가 포함되었습니다.");
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * 페이징 생성
+ * @param {String} targetObj 출력대상
+ * @param {int} totalCount 전체 갯수
+ * @param {int} unit 페이지당 출력수
+ * @param {int} now 현제 페이지
+ * @param {String} funcNm 클릭 이벤트 함수명
+ */
+function makePaging(targetObj, totalCount, unit, now ,funcNm){
+	var $trgObj = $(targetObj);
+	$trgObj.empty();
+
+	var pageSize = 10;
+
+	var firstPage = 1;
+	var lastPage = Math.ceil(totalCount / unit);
+
+	var firstPageOnList = Math.ceil(now / pageSize -1) * pageSize + 1;
+	var lastPageOnList = Math.ceil(now / pageSize) * pageSize;
+	lastPageOnList = (lastPageOnList > lastPage) ? lastPage : lastPageOnList;
+
+	var $pageDiv = $('<div class="col-md-12 col-xs-12 col-sm-12 t-center pad0"></div>');
+	var $pageUl = $('<ul class="pagination input-inline"></ul>');
+
+	var firstPageLabel = '<li class="prev"><a href="javascript:'+funcNm+'(\''+ firstPage + '\');" title="첫 페이지"><span style="display:none;">첫페이지</span><i class="fa fa-angle-double-left"></i></a></li> ';
+	var previousPageLabel = '<li><a href="javascript:'+funcNm+'(\''+ (firstPageOnList-1) +'\');" title="이전 10개 페이지"><span style="display:none;">이전 10개 페이지</span><i class="fa fa-angle-left"></i></a></li> ';
+	var nextPageLabel = '<li><a href="javascript:'+funcNm+'(\''+ (lastPageOnList+1) +'\');" title="다음 10개 페이지"><span style="display:none;">다음 10개 페이지</span><i class="fa fa-angle-right"></i></a></li> ';
+	var lastPageLabel = '<li class="next"><a href="javascript:'+funcNm+'(\''+ lastPage +'\');" title="끝 페이지"><span style="display:none;">끝 페이지</span><i class="fa fa-angle-double-right"></i></a></li> ';
+
+	var pageInfo = '<div class="input-group input-inline marL20"><div class="help-inline"> ( '+now+' / '+lastPage+' 페이지) / 총 '+ totalCount +'개</div></div>'
+
+
+	if(firstPageOnList > unit){
+		$pageUl.append(firstPageLabel);
+		$pageUl.append(previousPageLabel);
+	}
+	for(i = firstPageOnList; i<lastPageOnList+1; i++){
+		if(now == i){
+			$pageUl.append('<li class="active"><a href="javascript:;" title="현재 페이지('+i+')"> '+i+' </a></li>');
+		}else{
+			$pageUl.append('<li><a href="javascript:'+funcNm+'(\''+i+'\');" title="'+i+'번 페이지"> '+i+' </a></li>');
+		}
+	}
+	if(lastPageOnList < lastPage){
+		$pageUl.append(nextPageLabel);
+		$pageUl.append(lastPageLabel);
+	}
+	$pageDiv.append($pageUl);
+	$pageDiv.append(pageInfo);
+	$trgObj.append($pageDiv);
+}
+
+//기존 cosmis에서 소스 가져옴; com/include/js/common.js
+function getSelectedText(selectObj) {
+	for(var i=0; i < selectObj.options.length; i++) {
+		if(selectObj.options[i].value != '' && selectObj.options[i].selected) {
+			return selectObj.options[i].text;
+		}
+	}
+	return "";
+}
+
+//기존 cosmis에서 소스 가져옴; com/include/js/common.js
+function pad_zero(input) {
+	var vpn = input.value;
+	if (vpn.length == 1)
+		vpn = '0' + vpn;
+	input.value = vpn;
+}
+
+//intro.js 스크립트
+function initHelp(options) {
+	// HACK : Intro Js 처음 실행시 index -1 되는 문제 해결
+	var isFirstRun = true;
+	if (!options) {
+		alert('정의된 속성이 없습니다.\ntarget속성을 정의해주세요');
+		return false;
+	}
+	if (!options.steps) {
+		alert('help steps 속성을 정의해주세요');
+		return false;
+	}
+	if (!options.helpnm)
+		options.helpnm = "";
+
+	var intro = introJs();
+	intro.setOptions({
+		nextLabel: '다음 &rarr;',
+		prevLabel: '&larr; 이전',
+		doneLabel: '닫기',
+		disableInteraction: true,
+		steps: options.steps
+	});
+
+	// 도움말 버튼 클릭시
+	$('#' + options.button).on('click', function () {
+		if (isFirstRun) {
+			isFirstRun = false;
+		}
+		intro.setOption("showButtons", true);
+		intro.setOption("showBullets", true);
+		intro.setOption("showStepNumbers", true);
+		intro.refresh();
+		intro.start();
+	});
+
+	// 번호 버튼 클릭시
+	$('i[data-help]').on('click', function () {
+		intro.setOption("showButtons", false);
+		intro.setOption("showBullets", false);
+		intro.setOption("showStepNumbers", false);
+
+		var step = $(this).data('help') - 1;
+		if (isFirstRun) {
+			step += 1;
+			isFirstRun = false;
+		}
+		if (step == 0) {
+			// HACK : intro 의 리스트의 첫번째인 경우 두번째로 가는 문제 때문에 intro.start() 이용
+			// 반드시 첫번째 인트로의 경우 data-step="1" 이 되어야 함
+			intro.refresh();
+			intro.start();
+		} else {
+			intro.goToStepNumber(step).start();
+		}
+	});
+
+	return intro;
+}
+
+function init_acd_Help(options) {
+	// HACK : Intro Js 처음 실행시 index -1 되는 문제 해결
+	var isFirstRun = true;
+	if (!options) {
+		alert('정의된 속성이 없습니다.\ntarget속성을 정의해주세요');
+		return false;
+	}
+	if (!options.steps) {
+		alert('help steps 속성을 정의해주세요');
+		return false;
+	}
+	if (!options.helpnm)
+		options.helpnm = "";
+
+	var intro = introJs();
+	intro.setOptions({
+		nextLabel: '다음 &rarr;',
+		prevLabel: '&larr; 이전',
+		doneLabel: '닫기',
+		disableInteraction: true,
+		steps: options.steps
+	});
+
+	// 도움말 버튼 클릭시
+	$('#' + options.button).on('click', function () {
+		if (isFirstRun) {
+			isFirstRun = false;
+		}
+		intro.setOption("showButtons", true);
+		intro.setOption("showBullets", true);
+		intro.setOption("showStepNumbers", true);
+		intro.refresh();
+		intro.start();
+	});
+
+	//버튼 mouseover 시
+	$('i[data-help]').on('mouseover', function () {
+		intro.setOption("showButtons", false);
+		intro.setOption("showBullets", false);
+		intro.setOption("showStepNumbers", false);
+		
+		var step = $(this).data('help') - 1;
+		if (isFirstRun) {
+			step += 1;
+			isFirstRun = false;
+		}
+		if (step == 0) {
+			// HACK : intro 의 리스트의 첫번째인 경우 두번째로 가는 문제 때문에 intro.start() 이용
+			// 반드시 첫번째 인트로의 경우 data-step="1" 이 되어야 함
+			intro.refresh();
+			intro.start();
+		} else {
+			intro.goToStepNumber(step).start();
+		}
+		
+		
+		var f_target_id = $(this).data('input');
+		//console.log("f_target_id="+f_target_id);
+		//click
+		$('.introjs-disableInteraction').on('click', function (e) {
+			
+			var element_type = "";
+			
+			$("[name='"+f_target_id+"']").each(function(){
+				element_type = this.type;
+			});				
+			
+			if(!gfnIsNull(element_type)){
+				
+				if(element_type == "text"){
+					$("[name='"+f_target_id+"']").focus();
+				}
+				else if(element_type == "textarea"){
+					$("textarea[name='"+f_target_id+"']").focus();
+				}
+				else if(element_type == "select-one"){
+					//$("[name='"+f_target_id+"']").focus();
+					$("[name='"+f_target_id+"']").focus();
+				}
+				else if(element_type == "radio"){
+					//선택된값이 없는경우 첫번째 선택
+					if(gfnGetRadio(f_target_id) == -1){
+						$("input:radio[name='"+f_target_id+"']").prop("disabled",false);
+						$("input:radio[name='"+f_target_id+"']").eq(0).prop("checked",true).click();
+					}	
+					$("input:radio[name='"+f_target_id+"']").eq(0).focus();
+				}
+				else if(element_type == "checkbox"){
+					$("input:checkbox[name='"+f_target_id+"']").eq(0).focus();
+				}
+			}
+			
+			intro.exit(null);
+			
+			/*
+			if($("#"+f_target_id).length > 0){
+				$("#"+f_target_id).focus();
+			}
+			else
+			{
+				if($("input[name='"+f_target_id+"']").length == 1){
+					$("#"+f_target_id).focus();
+				}else if($("textarea[name='"+f_target_id+"']").length > 0){
+					$("textarea[name='"+f_target_id+"']").focus();
+				}else if($("input:radio[name='"+f_target_id+"']").length > 0){
+					//선택된값이 없는경우 첫번째 선택
+					if(gfnGetRadio(f_target_id) == -1){
+						$("input:radio[name='"+f_target_id+"']").prop("disabled",false);
+						$("input:radio[name='"+f_target_id+"']").eq(0).prop("checked",true).click();
+					}	
+					$("input:radio[name='"+f_target_id+"']").eq(0).focus();					
+				}
+			}
+			
+			intro.exit(null);
+			*/
+			
+			/*setTimeout(function(){
+				$("#"+f_target_id).focus();
+			},500);*/
+		});
+		
+		$('.introjs-disableInteraction').on('mouseout', function (e) {
+			intro.exit(null);			
+		});
+		
+	});
+	
+	return intro;
+}
+
+
+
+function init_spt_Help(options) {
+    // HACK : Intro Js 처음 실행시 index -1 되는 문제 해결
+    var isFirstRun = true;
+    if (!options) {
+        alert('정의된 속성이 없습니다.\ntarget속성을 정의해주세요');
+        return false;
+    }
+    if (!options.steps) {
+        alert('help steps 속성을 정의해주세요');
+        return false;
+    }
+    if (!options.helpnm)
+        options.helpnm = "";
+
+    var intro = introJs();
+    intro.setOptions({
+        nextLabel: '다음 &rarr;',
+        prevLabel: '&larr; 이전',
+        doneLabel: '닫기',
+        disableInteraction: true,
+        steps: options.steps
+    });
+
+    // 도움말 버튼 클릭시
+    $('#' + options.button).on('click', function () {
+        if (isFirstRun) {
+            isFirstRun = false;
+        }
+        intro.setOption("showButtons", true);
+        intro.setOption("showBullets", true);
+        intro.setOption("showStepNumbers", true);
+        intro.refresh();
+        intro.start();
+    });
+
+    //버튼 mouseover 시
+    $('i[data-help]').on('mouseover', function () {
+        intro.setOption("showButtons", false);
+        intro.setOption("showBullets", false);
+        intro.setOption("showStepNumbers", false);
+
+        var step = $(this).data('help') - 1;
+        if (isFirstRun) {
+            step += 1;
+            isFirstRun = false;
+        }
+        if (step == 0) {
+            // HACK : intro 의 리스트의 첫번째인 경우 두번째로 가는 문제 때문에 intro.start() 이용
+            // 반드시 첫번째 인트로의 경우 data-step="1" 이 되어야 함
+            intro.refresh();
+            intro.start();
+        } else {
+            intro.goToStepNumber(step).start();
+        }
+
+
+        var f_target_id = $(this).data('input');
+        //console.log("f_target_id="+f_target_id);
+        //click
+        $('.introjs-disableInteraction').on('click', function (e) {
+
+            var element_type = "";
+
+            $("[name='"+f_target_id+"']").each(function(){
+                element_type = this.type;
+            });
+
+            if(!gfnIsNull(element_type)){
+
+                if(element_type == "text"){
+                    $("[name='"+f_target_id+"']").focus();
+                }
+                else if(element_type == "textarea"){
+                    $("textarea[name='"+f_target_id+"']").focus();
+                }
+                else if(element_type == "select-one"){
+                    //$("[name='"+f_target_id+"']").focus();
+                    $("[name='"+f_target_id+"']").focus();
+                }
+                else if(element_type == "radio"){
+                    //선택된값이 없는경우 첫번째 선택
+                    if(gfnGetRadio(f_target_id) == -1){
+                        $("input:radio[name='"+f_target_id+"']").prop("disabled",false);
+                        $("input:radio[name='"+f_target_id+"']").eq(0).prop("checked",true).click();
+                    }
+                    $("input:radio[name='"+f_target_id+"']").eq(0).focus();
+                }
+                else if(element_type == "checkbox"){
+                    $("input:checkbox[name='"+f_target_id+"']").eq(0).focus();
+                }
+            }
+
+            intro.exit(null);
+
+            /*
+            if($("#"+f_target_id).length > 0){
+                $("#"+f_target_id).focus();
+            }
+            else
+            {
+                if($("input[name='"+f_target_id+"']").length == 1){
+                    $("#"+f_target_id).focus();
+                }else if($("textarea[name='"+f_target_id+"']").length > 0){
+                    $("textarea[name='"+f_target_id+"']").focus();
+                }else if($("input:radio[name='"+f_target_id+"']").length > 0){
+                    //선택된값이 없는경우 첫번째 선택
+                    if(gfnGetRadio(f_target_id) == -1){
+                        $("input:radio[name='"+f_target_id+"']").prop("disabled",false);
+                        $("input:radio[name='"+f_target_id+"']").eq(0).prop("checked",true).click();
+                    }
+                    $("input:radio[name='"+f_target_id+"']").eq(0).focus();
+                }
+            }
+
+            intro.exit(null);
+            */
+
+            /*setTimeout(function(){
+                $("#"+f_target_id).focus();
+            },500);*/
+        });
+
+        $('.introjs-disableInteraction').on('mouseout', function (e) {
+            intro.exit(null);
+        });
+
+    });
+
+    return intro;
+}
+
+function isProduction() {
+	if (location.hostname === "www.csi.go.kr") {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+jQuery.fn.serializeObject = function() {
+	var obj = null;
+	try {
+		if(this[0].tagName && this[0].tagName.toUpperCase() == "FORM" ) {
+			var arr = this.serializeArray();
+			if(arr){
+				obj = {};
+				jQuery.each(arr, function() {
+					obj[this.name] = this.value; 
+				});
+			}
+		}
+	}catch(e) {
+		alert(e.message);
+	}finally {}
+return obj; 
+}
+
+//htmlTagFilter 적용된 특수문자들을 다시 원래 문자로 변환
+function reverseHtmlTag(str){
+	var newStr = 
+		str.replace(/\&lt;/g,'<')
+			.replace(/\&gt;/g,'>')
+			.replace(/\&amp;/g,'&')
+			.replace(/\&quot;/g,'"')
+			.replace(/\&apos;/g,'\'')
+			.replace(/(\n|\r\n)/g, '<br>');
+	return newStr;
+}
+
+//htmlTagFilter 적용된 특수문자들을 다시 원래 문자로 변환
+function _reverseHtmlTag(str){
+	var newStr = 
+		str.replace(/\&lt;/g,'<')
+			.replace(/\&gt;/g,'>')
+			.replace(/\&amp;/g,'&')
+			.replace(/\&quot;/g,'"')
+			.replace(/\&apos;/g,'\'')
+			.replace(/(\n|\r\n)/g, '<br>');
+			/*.replace(/ /gi,'&nbsp;')*/
+	return newStr;
+}
+
+//htmlTagFilter 적용
+function _htmlTag(str){
+	var newStr = 
+		str.replace(/</g,'&lt;')
+			.replace(/>/g,'&gt;')
+			.replace(/\&/g,'&amp;')
+			.replace(/"/g,'&quot;')
+			.replace(/\'/g,'&apos;');
+	return newStr;
+}
+
+//숫자 3자리 단위마다 zhaak(comma) 찍기
+function numberWithCommas(x){
+	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+//ajax 로딩 이미지 보여주기
+function showAjaxLoadImage(){
+	var width = 50;
+    var height = 50;
+    var top = 50;
+    var left = 0;
+    
+    left = ( $(window).width() - width ) / 2 + $(window).scrollLeft();
+
+    if($("#div_ajax_load_image").length != 0) {
+    	$("#div_ajax_load_image").css({ "top": top+"%", "left": left+"px"});
+    	$("#div_ajax_load_image").show();
+    }else{
+    	$('body').append('<div id="div_ajax_load_image" style="position:fixed; top:' + top + '%; left:' + left + 'px; width:' + width + 'px; height:' + height + 'px; z-index:9999; filter:alpha(opacity=50); opacity:alpha*0.5; margin:auto; padding:0; "><img src="/com/img/ajax_loader.gif" style="width:50px; height:50px;" alt="검색중 이미지"></div>');
+    }
+}
+
+//ajax 로딩 이미지 숨기기
+function hideAjaxLoadImage(){
+	$("#div_ajax_load_image").hide();
+}
+
+function f_parseFloat(input) {
+	return input.value == '' ? 0 : parseFloat(input.value.replace(/,/g, ""));
+}
+
+//FORM 전송 - 191106 추가
+function returnFormSubmit(form, actionUrl, target) {
+	for(var i=0; i < form.elements.length; i++) {
+		if(form.elements[i].tagName.toLowerCase() == "input") {
+			removeMaskElm(form.elements[i]);
+		}
+	}
+	form.action = actionUrl;
+	form.target = target == undefined ? '_self' : '_'+target;
+	form.submit();	
+}
+
+function removeMaskElm(ctrl) {
+	var itype = getIType(ctrl);
+	switch (itype) {
+		case "MONEY":
+		case "FMONEY":
+			ctrl.value = ctrl.value.replace(/(\,)/g,"");
+		    ctrl.style.textAlign = "right";
+		    break;
+		case "YMD":
+		case "CARD":
+			ctrl.value = ctrl.value.replace(/-/g,"");
+	}
+}
+
+// ajax 프로시져 직접실행
+function ajaxProcJsonBox(proc_action, jsonObj, successFunc, errFunc, completeFunc) { 
+	var jsonData = jsonObj;
+	var arr = proc_action.split('@');
+	jsonData.proc_nm = arr[0];
+	jsonData.action_type = arr[1];
+	ajaxJson("/com/commonProcBox.do", jsonData, successFunc, errFunc, completeFunc);
+}
+
+//-----------------------------------------------------------------------------
+// 숫자에 3자리마다 , 를 찍어서 반환
+// @return : String
+//-----------------------------------------------------------------------------
+function addComma(str) {
+    var num = str.trim();
+    var dotnum = num.indexOf('.') < 0 ? '' : num.substring(num.indexOf('.'), num.length);
+    var num = num.indexOf('.') < 0 ? num : num.substring(0, num.indexOf('.'));
+    while((/(-?[0-9]+)([0-9]{3})/).test(num)) {
+        num = num.replace((/(-?[0-9]+)([0-9]{3})/), "$1,$2");
+    }
+    return num + (dotnum == '' ? '' : dotnum) ;
+}
+
+//-----------------------------------------------------------------------------
+// 날짜형식으로 변환
+// @return : String
+//-----------------------------------------------------------------------------
+function toDateYMD(str) {
+   var val = str.replaceAll('-','');
+   if (val.length >= 8)
+     return val.substring(0,4) + '-' + val.substring(4,6) + '-' + val.substring(6,8);
+   else if (val.length >= 6)
+     return val.substring(0,4) + '-' + val.substring(4,6);
+   else
+     return val;
+}
+
+
+/**
+ * Bootstrap 시작일 종료일 범위설정
+ * @param {string} startSelector 시작일 INPUT 선택자
+ * @param {string} endSeletor 종료일 INPUT 선택자
+ */
+function datePickerSEInit(startSelector, endSeletor) {
+
+	var $start = $(startSelector);
+	var $end = $(endSeletor);
+
+	if($start.length != 1 || $end.length != 1){
+		if($start.length < 1){
+			throw new Error('시작일이 없습니다.');
+		}
+		if($end.length < 1) {
+			throw new Error('종료일이 없습니다.');
+		}
+		if($start.length > 1){
+			throw new Error('시작일이 너무 많습니다.');
+		}
+		if($end.length > 1) {
+			throw new Error('종료일이 너무 많습니다.');
+		}
+	}
+
+	$start.on('change', function() {
+		$end.closest('.date-picker')
+			.data('datepicker')
+			.setStartDate(getDate(this));
+	});
+
+	$end.on('change', function() {
+		$start.closest('.date-picker')
+			.data('datepicker')
+			.setEndDate(getDate(this));
+	});
+
+	function getDate( element ) {
+		var date;
+		var dateNumber;
+		try {
+			/*
+				HACK : moment.js 로 parsse 및 validate 로 변경필요
+			*/
+			dateNumber = Date.parse(element.value);
+			if(isNan(dateNumber)){
+				return date = null;
+			}
+			date = new Date(dateNumber);
+		} catch (error) {
+			date = null;
+		}
+		console.dir(date);
+		return date;
+	}
+}
+
+//글자 수 byte 리턴 ; 사용법 : getByteLength(String);
+function getByteLength(s,b,i,c){
+	s = s.replaceAll("&","&amp;")
+			.replaceAll("<","&lt;")
+		    .replaceAll(">","&gt;")            
+		    .replaceAll("\"","&quot;")
+		    .replaceAll("'","&apos;");
+	
+    for(b=i=0;c=s.charCodeAt(i++);b+=c>>11?3:c>>7?2:1);
+    return b;
+}
+
+//글자 수 byte 리턴 ; 사용법 : getByteLenOpt(String,{hLen:3});
+function getByteLenOpt(str,opt){
+	str = str.replaceAll("&","&amp;")
+			 .replaceAll("<","&lt;")
+			 .replaceAll(">","&gt;")            
+			 .replaceAll("\"","&quot;")
+			 .replaceAll("'","&apos;");
+	
+	var byte = 0;
+	var hLen = gfnGetDfVal(opt.hLen,2);
+	
+	if(hLen > 3 || hLen < 2) hLen = 2;
+	
+	for(var i = 0; i < str.length; i++){
+		(str.charCodeAt(i) > 127) ? byte += hLen : byte++;
+	}
+	
+	return byte;
+}
+
+
+function fn_reverse_htmltag_ajax(str){
+	str = str.replaceAll("&amp;","&")
+			.replaceAll("&lt;","<")
+		    .replaceAll("&gt;",">")
+		    .replaceAll("&quot;","\"")
+		    .replaceAll("&apos;","'")
+		    .replaceAll("&amp;","&");
+	return str;
+}
+	
+/*
+ * 글자 수에 대한 유효성 검사 또는 글자 수 표시
+ * objId != undefined : 글자 수 표시
+ * objId == undefined : 글자 수 유효성 검사
+ * param
+	textLength: 제한되는 글자 수
+	obj: 오브젝트(ex. this)
+	objId: 오브젝트 id명		
+ */
+function fn_textLength(textLength,obj,objId){
+	
+	var str = $(obj).val();
+		str = str.replaceAll("&","&amp;")
+				.replaceAll("<","&lt;")
+			    .replaceAll(">","&gt;")            
+			    .replaceAll("\"","&quot;")
+			    .replaceAll("'","&apos;");
+		
+	var len = str.length;
+	
+	if(objId == undefined){
+		if(len > textLength){
+			messageBox.alert("'"+$(obj).attr("title") +"'의 입력 글자 수는 최대 "+numberWithCommas(textLength)+"자까지 가능합니다. 글자 수를 줄여주세요.");
+			return false;
+		}else{
+			return true;
+		}
+	}else{
+		$("#"+objId).text("("+numberWithCommas(len)+" / "+numberWithCommas(textLength)+"자)");
+	}
+}
+
+
+function gfn_isV9user(isV9)
+{
+	if(gfnIsNull(isV9)){
+		return false;
+	}else if(isV9 == "Y"){
+		alert("해당 계정은 조회만 가능합니다.");
+		return true;
+	}else{
+		return false;
+	}
+}
+
+/** 파일사이즈 자동 계산 출력 - 20160614 kjk */
+function getfileSize(x) {
+	if(typeof(x) === "string") x = x.replaceAll(',','');
+	
+	var s = ['Byte', 'KB', 'MB', 'GB', 'TB', 'PB'];
+	var e = Math.floor(Math.log(x) / Math.log(1024));
+	var r = (x / Math.pow(1024, e)).toFixed(2);
+	
+	if(r-Math.floor(r) == 0) r = Math.floor(r);
+	return r + "" + s[e];
+}
+
+/** 자동으로 날짜에 하이픈 추가 쿼리*/
+function auto_date_format( e, oThis ){
+	var num_arr = [ 
+		97, 98, 99, 100, 101, 102, 103, 104, 105, 96,
+		48, 49, 50, 51, 52, 53, 54, 55, 56, 57
+	];
+	
+	var key_code = ( e.which ) ? e.which : e.keyCode;
+	if( num_arr.indexOf( Number( key_code ) ) != -1 ){
+		var len = oThis.value.length;
+		if( len == 4 ) oThis.value += "-";
+		if( len == 7 ) oThis.value += "-";
+	}
+}
+
+
+/*CaptCha 오디오 요청; 해킹 대응(kjk, 20211101) */
+function audioCaptcha() {	
+				
+	var uAgent = navigator.userAgent;
+	var soundUrl = '/security/captChaAudio.do';
+
+	if (uAgent.indexOf('Trident') > -1 || uAgent.indexOf('MSIE') > -1) {
+		winPlayer(soundUrl+'?agent=msie');
+	} else if (!!document.createElement('audio').canPlayType) {
+		try { new Audio(soundUrl).play(); } catch(e) { winPlayer(soundUrl); }
+	} else window.open(soundUrl, '', 'width=1,height=1');
+	
+}
+/*CaptCha 오디오 요청; 해킹 대응(kjk, 20211101) */
+function winPlayer(objUrl) {
+	$('#audiocatpch').html(' <bgsound src="' + objUrl + '">');
+}
+
+function mergeTelFaxNo(no1, no2, no3) {
+    var no = "";
+    if (no1 && no2 && no3) {
+        no = no1 +"-"+no2 +"-"+no3;
+    }
+    return no;
+}
+
+/**
+ * OCR을 통해 추출된 text를 서식에 맞게 map형태로 변환한다.
+ * 서식종류
+ * > 사업자등록증(gbCd:BIZ) - bizType : corp(법인사업자) / gen(일반과세자)
+ * > 건설기술용역업등록증(gbCd:CE1),건설엔지니어링업등록증(gbCd:CE2)
+ * @param str (OCR return param)
+ * @returns object
+ */
+function setOcrTextObj(res){
+	/* TODO : ERROR Code 재정의필요
+
+		resultCode
+		#공통 999X
+		9999 : OCR 리턴값 오류. 이미지 변환오류. 파일크기가 크면 오류남.
+		9991 : 서식 구분코드(gbCd)가 존재하지않음
+			
+		# 990x : 사업자등록증
+		9900 : 사업자등록번호 체크 오류
+		9901 : 법인명(단체명),상호 유무 체크 
+		9902 : 텍스트 추출 오류 strRangeCustomObj()의 리턴값이 false일때 발생.
+		9903 : 대표자,성명 유무 체크
+		
+		# 991x : 건설기술용역업등록증 / 건설엔지니어링업등록증
+		9910 : 전문분야(세부분야) 값이 없는경우
+		9911 : 전문분야의 항목이 '설계·사업관리'가 아닌경우
+		9912 : 텍스트 추출 오류 strRangeCustomObj()의 리턴값이 false일때 발생.
+		9913 : 전문분야의 항목 > '설계·사업관리' 항목이 [일반,설계등용역 일반, 건설사업관리, 종합] 에 해당되지 않는 경우
+		 
+	*/
+	var obj = {};	// return value
+	var gbCd;	// 서식 구분코드 (확장시 공통코드로 관리해야함)
+	
+	obj.result = 'SUCCESS';
+	obj.resultCode;
+	obj.resultMessage;
+	
+	if(res.images[0].inferResult == 'ERROR'){
+		obj.result = 'ERROR';
+		obj.resultCode = '9999';
+		obj.resultMessage = '텍스트 추출중 문제가 발생하였습니다. 관리자에 문의하세요.';
+		return obj;
+	}
+	
+	//ocr text 변환
+	var resImgArr = res.images[0].fields;
+	var newImgArr = [];
+	
+	resImgArr.forEach(function(i){
+		newImgArr.push(i.inferText);
+	});
+	var joinStr = newImgArr.join('%');
+	var imgAllStr = joinStr.replaceAll('%:%','@:@').replaceAll(':%','@:@').replaceAll(' ','');
+	
+	//서식추가 시  코드 추가
+	if(imgAllStr.match('사업자등록증')) gbCd = 'BIZ'
+	else if(imgAllStr.match('건설기술용역업등록증') || imgAllStr.match('건설기술용역업%등록증')) gbCd = 'CE1'	// 구서식
+	else if(imgAllStr.match('건설엔지니어링업등록증') || imgAllStr.match('건설엔지니어링업%등록증')) gbCd = 'CE2' // 서식내영 구서식이랑 바뀔수도있으니 1,2로 구분해놈
+	
+	if(gbCd == undefined) {
+		obj.result = 'ERROR';
+		obj.resultCode = '9991';
+		obj.resultMessage = '지원하지않는 서식 종류입니다. 관리자에 문의하세요.';
+		return obj;
+	}
+	obj.gbCd = gbCd;
+	
+	// 서식별 항목 추출
+	if(gbCd == 'BIZ'){
+		var bizType = imgAllStr.match('법인사업자') ? 'corp' : 'gen' ;	// 법인사업자, 일반과세자 구분
+		
+		// ids setting :: ids = {str1,end1,str2,end2,...}
+		var ids = {
+				job : '사업의종류,발급사유,사업의%종류,발%급%사%유,사업의%종%류,발급사%유,,발%급사유'
+		};
+		
+		if(bizType == 'corp'){
+			//법인사업자
+			ids.bizmNo = '등록번호,법인명(단체명),등록%번호,법인명%(단체명),,법인명(%단체명)';		//등록번호
+			ids.instNm = '법인명(단체명),대표자,법인명%(단체명),대%표%자,법인명(%단체명),대%표자';	//법인명
+			ids.repPersonNm = '대표자,개업연월일,대%표%자,개업년월일,대%표자,개업%년월일,,개업연%월일,,개%업연월일';			//대표자
+			ids.corpRegNo = '법인등록번호,사업장소재지,법인%등록번호,사업장%소재지';	//법인등록번호
+			ids.addr = '사업장소재지,본점소재지,사업장%소재지,본점%소재지';	//소재지
+		}else{
+			//일반과세자
+			ids.bizmNo = '등록번호,상호,등록%번호,상%호';			//등록번호
+			ids.instNm = '상호,성명,상%호,성%명';				//상호
+			ids.repPersonNm = '성명,생년월일,성%명,생%년%월%일,,주민등록번호';	//성명
+			ids.addr = '사업장소재지,사업의종류,사업장%소재지,사업의%종류,사업자의주소,사업종류';	//소재지
+		}
+		
+		// return obj setting
+		obj.title = '사업자등록증';
+		obj.bizType = bizType; // corp : 법인사업자 / gen : 일반과세자 구분
+		
+		var idsKeyList = Object.keys(ids);
+		for(var i in idsKeyList){
+			if(idsKeyList[i] == 'job'){
+				var job = strRangeCustomObj(ids[idsKeyList[i]],imgAllStr);
+				if(!job){
+					obj.uptae = '';
+					obj.upjong = '';
+				}else{
+					job = job.match('[^a-z|A-Z]+')[0];	// 사업의종류 부분에 서식 뒷배경이 인식되는 경우가 있어 영문자 제거함
+					obj.uptae = job.substr(0, job.indexOf('종목')).replace('업태','').replaceAll('%',' ').trim();	//업태
+					obj.upjong = job.substr(job.indexOf('종목')).replace('종목','').match('\%(.*?)\%')[0].replaceAll('%',' ').trim();	//업종
+				}
+			}else{
+				var temp = strRangeCustomObj(ids[idsKeyList[i]],imgAllStr);
+				if(!temp){	//인식안된 항목은 공백으로 넘기기
+					obj[idsKeyList[i]] = '';
+					continue;
+				}	
+				obj[idsKeyList[i]] = temp.replaceAll('%',' ').trim();
+			}
+		}
+		
+		// 필수값 체크 area
+		//사업자등록번호 체크 
+		if(!checkCorpRegNo(obj.bizmNo.replaceAll('-',''))){
+			obj.result = 'ERROR';
+			obj.resultCode = '9900';
+			obj.resultMessage = '제출한 서식의 사업자등록번호의 정확성이 부족합니다. 관리자에 문의하세요.';
+		}
+		
+		//법인명(단체명), 상호 유무 체크
+		if(obj.instNm == null || obj.instNm == ''){
+			obj.result = 'ERROR';
+			obj.resultCode = '9901';
+			obj.resultMessage = '제출한 서식의 법인명(단체명) 또는 상호의 정확성이 부족합니다. 관리자에 문의하세요.';
+		}
+		
+		//대표자 유무 체크
+		if(obj.repPersonNm == null || obj.repPersonNm == ''){
+			obj.result = 'ERROR';
+			obj.resultCode = '9903';
+			obj.resultMessage = '제출한 서식의 대표자 또는 성명의 정확성이 부족합니다. 관리자에 문의하세요.';
+		}
+		
+	}else if(gbCd == 'CE1' || gbCd == 'CE2'){
+		// ids setting :: ids = {str1,end1,str2,end2,...}
+		var ids = {
+				instNm : '상호또는법인명,영업소의소재지,상호%또는%법인명,영업소의%소재지,상호또는%법인명,,상호%또는%명칭,,상호%또는법인명,'	//상호
+				,repPersonNm : '성명,생년월일,성%명,생%년%월%일,성명%(대표자),주민등록번호'	//대표자
+				,jobType : '전문분야(세부분야),등록연월일,전문분야%(세부분야),등록년월일,,(최초)등록%연월일,,최초등록%연월일,,등록%연월일' //전문분야
+		}
+		
+		obj.title = (gbCd == 'CE1') ?  '건설기술용역업 등록증' : '건설엔지니어링업 등록증';
+		
+		var idsKeyList = Object.keys(ids);
+		for(var i in idsKeyList){
+			if(idsKeyList[i] == 'jobType'){	//전문분야(세부분야)
+				var job = strRangeCustomObj(ids[idsKeyList[i]],imgAllStr);
+				if(!job){
+					obj.job = '';
+					obj.jobType = '';
+				}else{
+					job = job.replaceAll('%','').trim();
+					if(job.match('설계·사업관리')){
+						obj.job = job;
+						obj.jobType = job.match('\\((.*?)\\)')[1];
+					}else{
+						obj.jobType = '';
+					}
+				}
+			}else{
+				var temp = strRangeCustomObj(ids[idsKeyList[i]],imgAllStr);
+				if(!temp){	//인식안된 항목은 공백으로 넘기기
+					obj[idsKeyList[i]] = '';
+					continue;
+				}
+				obj[idsKeyList[i]] = temp.replaceAll('%',' ').trim(); 
+			}	
+		}
+		
+		//법인명(단체명), 상호 유무 체크
+		if(obj.instNm == null || obj.instNm == ''){
+			obj.result = 'ERROR';
+			obj.resultCode = '9910';
+			obj.resultMessage = '제출한 서식의 법인명(단체명) 또는 상호의 정확성이 부족합니다. 관리자에 문의하세요.';
+		}
+		
+		//대표자 유무 체크
+		if(obj.repPersonNm == null || obj.repPersonNm == ''){
+			obj.result = 'ERROR';
+			obj.resultCode = '9911';
+			obj.resultMessage = '제출한 서식의 대표자 또는 성명의 정확성이 부족합니다. 관리자에 문의하세요.';
+		}
+		
+		//대표자 유무 체크
+		if(obj.job == null || obj.job == ''){
+			obj.result = 'ERROR';
+			obj.resultCode = '9912';
+			obj.resultMessage = '제출한 서식에 전문분야(세부분야)의 정확성이 부족합니다. 관리자에 문의하세요.';
+		}else if(obj.jobType == null || obj.jobType == ''){
+			obj.result = 'ERROR';
+			obj.resultCode = '9913';
+			obj.resultMessage = '제출한 서식에 설계·사업관리의 정확성이 부족합니다. 관리자에 문의하세요.';
+		}
+	}
+	return obj;
+	
+}
+
+/**
+ * OCR 텍스트 추출 커스텀 - 선언한 targets 기준으로 텍스트 위치를 찾아 ':' 기준으로 항목 추출한다.
+ * @param str targets - 'strIdx1,endIdx1,strIdx2,endIdx2,...'
+ * @param str textAll - ocr에서 추출된 전체 text 
+ * @returns str
+ */
+function strRangeCustomObj(targets, textAll){
+	var arr = targets.split(',');
+	
+	var idx1 = 0;
+	var idx2 = 0;
+	
+	arr.some(function(v, i){
+		if(v == '' || v == null) return false;
+		if((idx1 === -1 || idx1 === 0) && (i % 2 === 0)) idx1 = textAll.indexOf(v);
+		if((idx2 === -1 || idx2 === 0) && (i % 2 === 1)) idx2 = textAll.indexOf(v);
+		if(idx1 > 0 && idx2 > 0) return true;
+	})
+	
+	if(idx1 > -1 && idx2 > -1){
+		if(textAll.substring(idx1, idx2).match('@:@') != '@:@'){
+			return false;
+		}else{
+			return textAll.substring(idx1, idx2).split('@:@')[1];
+		}
+	}else{
+		return false;
+	}	
+}
+
+/**
+ * callUrl 호출 후 OCR을 통해 성공시, 추출된 내용을 setOcrTextObj() func 호출하여 항목별 추출 성공시 Object 형태로 successFunc()에 값 넘긴다.
+ * 
+ * @param OCR 호출 url : context-properties > clovaOCR.url
+ * @param OCR X-OCR-SECRET serviceKey : context-properties > clovaOCR.serviceKey
+ * @param fileData :el.files[0] 형태. 
+ * 			ex) document.getElementById("uploadFile").files[0]
+ */
+function ocrAjaxData(callUrl, serviceKey, fileData, successFunc, errFunc, completeFunc){
+	
+	// 지원 포맷 선언 및 체크
+	var formatItm = ['jpg','jpeg','png','pdf','JPG','JPEG','PNG','PDF'];
+	var inFormat = fileData.type.split('/')[1];
+	
+	var a = 0;
+	formatItm.some(function(i){
+		if(inFormat === i) a++;
+	});
+	if(a === 0) return alert("지원하지않는 확장자입니다.jpg,jpeg,png,pdf 확장자 파일을 선택해주세요.");
+	
+	// send param setting
+	var message = {
+			images : [{format : inFormat, name : fileData.name.trim().replace(/(.jpg|.jpeg|.png|.pdf|.JPG|.JPEG|.PNG|.PDF)$/,'').split('.')[0]}]
+			,requestId : "string"
+			,resultType : "string"
+			,timestamp : new Date().getTime()
+			,version : "V1"
+	}
+	
+	var formData = new FormData();
+	formData.append("file", fileData);
+	formData.append("message",JSON.stringify(message));
+	
+	$.ajax({
+		type : 'POST',
+		enctype : "multipart/form-data",
+		url : callUrl,
+	    data : formData,
+	    processData : false,
+        contentType : false,
+        headers : {"X-OCR-SECRET": serviceKey },
+	    success : function(data) {
+	    	var res = setOcrTextObj(data);
+	    	
+	    	if(res == undefined){
+	    		alert("파일 추출중 문제가 발생했습니다. 관리자에 문의하세요.");
+	    	}else if(res.result == 'ERROR'){
+	    		alert(res.resultMessage);
+	    		// 에러코드 뱉을때 이후 펑션 넘길지말지...?
+	    		if (errFunc) {
+	    			errFunc(res);
+		        }
+	    	}else if(res.result == 'SUCCESS'){
+	    		alert("파일 추출에 성공했습니다.");
+	    		if (successFunc) {
+		            successFunc(res);
+		        }
+			}
+	    },
+	    error : function(error){
+	    	var errCode = error.responseJSON.code;
+	    	
+	    	if(errCode == '1100'){
+	    		alert('인증요청에 문제가 발생했습니다. 관리자에 문의하세요.');
+	    	}else if(error.status == "999"){
+	            alert("해당 계정은 조회만 가능합니다.");
+	        }else{
+	            if(errFunc == null) alert("에러");
+	        }
+	        if (errFunc) {	errFunc(); }
+	    },
+	    complete : function(data) {
+	        if (completeFunc) {
+	            completeFunc(data);
+	        }
+	    }
+	});
+}
+
+/**
+ * ocrAjaxData 개발테스트용 - res값 셋팅 
+ */
+function test_ocrAjaxData(testType, callUrl, serviceKey, fileData, successFunc, errFunc, completeFunc){
+	
+	// 지원 포맷 선언 및 체크
+	var formatItm = ['jpg','jpeg','png','pdf','JPG','JPEG','PNG','PDF'];
+	var inFormat = fileData.type.split('/')[1];
+	
+	var a = 0;
+	formatItm.some(function(i){
+		if(inFormat == i) a++;
+	});
+	if(a == 0) return alert("지원하지않는 확장자입니다.jpg,jpeg,png,pdf 확장자 파일을 선택해주세요.");
+	
+	// send param setting
+	var message = {
+			images : [{format : inFormat, name : fileData.name.trim().replace(/(.jpg|.jpeg|.png|.pdf|.JPG|.JPEG|.PNG|.PDF)$/,'').split('.')[0]}]
+			,requestId : "string"
+			,resultType : "string"
+			,timestamp : new Date().getTime()
+			,version : "V1"
+	}
+	
+	var formData = new FormData();
+	formData.append("file", fileData);
+	formData.append("message",JSON.stringify(message));
+	
+	var resObj = {};
+	if(testType == "mng"){
+		resObj.gbCd = "BIZ"
+		,resObj.bizmNo = "123-12-12345"
+		,resObj.instNm = "(주)브레인기술"
+		,resObj.repPersonNm = "김정우"
+		,resObj.corpRegNo = "110111-7431292"	//값이 없을수도있음 (법인) 에만 값존재
+		,resObj.addr = "서울특별시 영등포구 선유로 13길 25,6층 607호(문래동6가,에이스하이테크시티2)"
+		,resObj.uptae = "제조업"
+		,resObj.upjong = "페인트"
+		,resObj.result = "SUCCESS"
+		,resObj.resultMessage = ""
+		,resObj.title = "사업자등록증"
+	}else if(testType == 'evi'){
+		resObj.gbCd = "CE2"
+		,resObj.instNm = "(주)브레인기술" 
+		,resObj.job = "설계·사업관리(건설사업관리)"
+		,resObj.jobType = "건설사업관리"	//일반,설계등용역일반,종합
+		,resObj.repPersonNm = "김정우"
+		,resObj.result = "SUCCESS"
+		,resObj.resultMessage = ""
+		,resObj.title = "건설엔지니어링 등록증"
+	}
+	
+	if(resObj == undefined){
+		alert("파일 추출중 문제가 발생했습니다. 관리자에 문의하세요.");
+	}else if(resObj.result == 'ERROR'){
+		alert(resObj.resultMessage);
+		// 에러코드 뱉을때 이후 펑션 넘길지말지...?
+		if (errFunc) {
+			errFunc(resObj);
+        }
+	}else if(resObj.result == 'SUCCESS'){
+		alert("파일 추출에 성공했습니다.");
+		if (successFunc) {
+            successFunc(resObj);
+        }
+	}
+	
+	/* start :: 사업자등록증 test */
+	/*
+	 *  정상
+	 	resObj.gbCd = "BIZ"
+		,resObj.bizmNo = "123-12-12345"
+		,resObj.instNm = "(주)브레인기술"
+		,resObj.repPersonNm = "김정우"
+		,resObj.corpRegNo = "110111-7431292"	//값이 없을수도있음 (법인) 에만 값존재
+		,resObj.addr = "서울특별시 영등포구 선유로 13길 25,6층 607호(문래동6가,에이스하이테크시티2)"
+		,resObj.uptae = "제조업"
+		,resObj.upjong = "페인트"
+		,resObj.result = "SUCCESS"
+		,resObj.resultMessage = ""
+		,resObj.title = "사업자등록증"
+		
+	 */
+	
+	/*
+	 *  에러 - 제출한 서식의 법인명(단체명) 또는 상호의 정확성이 부족합니다. 관리자에 문의하세요.
+	 	resObj.gbCd = "BIZ"
+		,resObj.bizmNo = "363-62-54321"
+		,resObj.instNm = ""
+		,resObj.repPersonNm = "김민수"
+		,resObj.corpRegNo = "130131-6444292"	//값이 없을수도있음 (법인) 에만 값존재
+		,resObj.addr = "서울특별시 금천구 벚꽃로 1길 25"
+		,resObj.uptae = "제조업"
+		,resObj.upjong = "페인트"
+		,resObj.result = "ERROR"
+		,resObj.title = "사업자등록증"
+		,resObj.resultMessage = '제출한 서식의 법인명(단체명) 또는 상호의 정확성이 부족합니다. 관리자에 문의하세요.';
+	 */
+
+	
+	/*
+	 *  에러 - 제출한 서식의 사업자등록번호의 정확성이 부족합니다. 관리자에 문의하세요..
+	 	resObj.gbCd = "BIZ"
+		,resObj.bizmNo = ""
+		,resObj.instNm = "주식회사 대명이엔지"
+		,resObj.repPersonNm = "함원식"
+		,resObj.corpRegNo = "154611-0010041"	//값이 없을수도있음 (법인) 에만 값존재
+		,resObj.addr = "충청북도 단양군 단양읍 중앙 1로 23"
+		,resObj.uptae = "서비스"
+		,resObj.upjong = "엔지니어링서비스"
+		,resObj.result = "ERROR"
+		,resObj.title = "사업자등록증"
+		,resObj.resultMessage = '제출한 서식의 사업자등록번호의 정확성이 부족합니다. 관리자에 문의하세요.';
+	 */
+
+	/*
+	 *  에러 - 제출한 서식의 대표자 또는 성명의 정확성이 부족합니다. 관리자에 문의하세요..
+	 	resObj.gbCd = "BIZ"
+		,resObj.bizmNo = "448-88-01572"
+		,resObj.instNm = "주식회사 진원엔지니어링"
+		,resObj.repPersonNm = ""
+		,resObj.corpRegNo = "175711-0013212"	//값이 없을수도있음 (법인) 에만 값존재
+		,resObj.addr = "충청남도 서천군 서천읍 군청로 44-1"
+		,resObj.uptae = "서비스업"
+		,resObj.upjong = "토목엔지니어링"
+		,resObj.result = "ERROR"
+		,resObj.title = "사업자등록증"
+		,resObj.resultMessage = '제출한 서식의 대표자 또는 성명의 정확성이 부족합니다. 관리자에 문의하세요.';
+	 */
+	/* end :: 사업자등록증 test  */
+	
+	
+	/* start :: 건설엔지니어링 등록증 test  */
+		/* 정상
+		 * resObj.gbCd = "CE2"
+		,resObj.instNm = "(주)브레인기술" 
+		,resObj.job = "설계·사업관리(설계등용역일반)"
+		,resObj.jobType = "설계등용역일반"	//일반,설계등용역일반,종합
+		,resObj.repPersonNm = "김정우"
+		,resObj.result = "SUCCESS"
+		,resObj.title = "건설엔지니어링 등록증"
+		 */
+	/*  에러 - 제출한 서식의 법인명(단체명) 또는 상호의 정확성이 부족합니다. 관리자에 문의하세요.
+	 * resObj.gbCd = "CE1"
+		,resObj.instNm = "" 
+		,resObj.job = "설계·사업관리(설계등용역일반)"
+		,resObj.jobType = "설계등용역일반"	//일반,설계등용역일반,종합
+		,resObj.repPersonNm = "조현근"
+		,resObj.result = "ERROR"
+		,resObj.title = "건설기술용역업 등록증"
+		,resObj.resultMessage = '제출한 서식의 법인명(단체명) 또는 상호의 정확성이 부족합니다. 관리자에 문의하세요.';
+	 */
+	
+	/*  에러 - 제출한 서식의 대표자 또는 성명의 정확성이 부족합니다. 관리자에 문의하세요.
+	 * resObj.gbCd = "CE1"
+		,resObj.instNm = "(주)진성이앤씨" 
+		,resObj.job = "설계·사업관리(설계등용역일반)"
+		,resObj.jobType = "설계등용역일반"	//일반,설계등용역일반,종합
+		,resObj.repPersonNm = ""
+		,resObj.result = "ERROR"
+		,resObj.title = "건설기술용역업 등록증"
+		,resObj.resultMessage = '제출한 서식의 대표자 또는 성명의 정확성이 부족합니다. 관리자에 문의하세요.';
+	 */
+	
+	/*  에러 - 제출한 서식에 전문분야(세부분야)의 정확성이 부족합니다. 관리자에 문의하세요.
+	 * resObj.gbCd = "CE1"
+		,resObj.instNm = "(주)인터조경기술사사무소" 
+		,resObj.job = ""
+		,resObj.jobType = ""	//일반,설계등용역일반,종합
+		,resObj.repPersonNm = "김수연"
+		,resObj.result = "ERROR"
+		,resObj.title = "건설기술용역업 등록증"
+		,resObj.resultMessage = '제출한 서식에 전문분야(세부분야)의 정확성이 부족합니다. 관리자에 문의하세요.';
+	 */
+	
+	/*  에러 - 제출한 서식에 설계·사업관리의 정확성이 부족합니다. 관리자에 문의하세요..
+	 * resObj.gbCd = "CE1"
+		,resObj.instNm = "주식회사 세원"
+		,resObj.job = "설계·사업관리(설계등용역일반)"
+		,resObj.jobType = ""	//일반,설계등용역일반,종합
+		,resObj.repPersonNm = "김기영"
+		,resObj.result = "ERROR"
+		,resObj.title = "건설기술용역업 등록증"
+		,resObj.resultMessage = '제출한 서식에 설계·사업관리의 정확성이 부족합니다. 관리자에 문의하세요.';
+	 */
+	
+	//return resObj;
+}

@@ -1,0 +1,951 @@
+var sas = {
+    sasJsonData:null,
+    currentQuestion:"",
+    sasdata:{titleName:"",openDate:"",closeDate:""},
+    pages:[],
+    questions:[],
+    offsetX:"",
+    offsetY:"",
+    currentDiv:"",
+    originalIndex:"",
+    targetDiv:"",
+
+    option_type:{normal:"NORMAL",etc:"ETC",firstLabel:"FL",lastLabel:"LL",tableHeader:"TH",tableRowLabel:"RL",tableOption:"OT",lineOption:"OL" },
+    question_type:[
+    	{type:"MULT",      name:"객관식",  fn:function(id,type){sas.onMultipleChoice(id,type)}},
+    	{type:"TEXT",      name:"주관식",  fn:function(id,type){sas.onTextArea(id,type)}},
+    	{type:"LINE",      name:"선형배율", fn:function(id,type){sas.onLineScore(id,type)}},
+    	{type:"TABLE",     name:"선택형",      fn:function(id,type){sas.onTableQuestions(id,type)}},
+    	{type:"CHECKBOX",  name:"체크박스",   fn:function(id,type){sas.onCheckBox(id,type)}},
+    	{type:"RADIO",     name:"라디오버튼",     fn:function(id,type){sas.onRadio(id,type)}},
+    	{type:"REQUIRED",  name:"필수"},
+    	{type:"DELETE",    name:"삭제",        fn:function(id,type){sas.onDivCardDelete(id,type)}},
+	
+    ],
+    
+    onAddPage:function(){
+	  pageNo = sas.pages.length+1	
+	  sas.pages.push({page_no:pageNo,question_type:"PAGE",question:""})
+	  sas.onEdit(); 
+
+    },
+     onAddQuestion:function(page){
+             questionNo = sas.questions.length+1	 
+             sas.questions.push({qid:questionNo,question_type:"",question:"" ,select_type:"radio",page_no:page ,required_yn:"N"})  
+             sas.onEdit();
+            /* sas.onDataBindHtml(_.last(sas.questions));*/
+       
+     },
+     onMultipleChoice:function(qstId,type){
+         var divQst = document.querySelector("#qst"+qstId);
+         var currentQst  =_.find(sas.questions,{'qid':qstId});    
+         if(_.isEmpty(currentQst.question_type)||(currentQst.question_type!=type)){
+        	divQst.innerHTML="";
+        	currentQst.option =[];
+        	currentQst.question_type=type;
+        	
+          var divNormalOpt = document.createElement('div');
+          divNormalOpt.setAttribute("id","NORMAL"+qstId);
+          var divEtcOpt= document.createElement('div');
+          divEtcOpt.setAttribute("id","ETC"+qstId);
+          divQst.appendChild(divNormalOpt);
+          divQst.appendChild(divEtcOpt);
+          divQst.appendChild(sas.element.createButton("옵션추가",function(){sas.onAddMultipleChoice(qstId,currentQst,sas.option_type.normal,false)}));	
+          divQst.appendChild(sas.element.createButton("기타추가",function(){sas.onAddMultipleChoice(qstId,currentQst,sas.option_type.etc,false)}));	
+         /* divcard.appendChild(divQst); */
+         }
+     },
+     onAddMultipleChoice:function(qstId,qst,option_type,delStatus,selectType){
+         var selectType = qst.select_type;
+         var data = qst.option;
+	 var isEmptyEtc = !_.isEmpty(_.filter(data,{option_type:sas.option_type.etc})); 
+	 var divOpt =document.querySelector("#"+option_type+qstId);
+	 if(!delStatus){	   	
+            if(!(isEmptyEtc && option_type == sas.option_type.etc)){
+        	if (option_type == sas.option_type.etc){
+        	    data.push({qid:qstId,oid:99,option_type:option_type,option:""});
+        	}else{
+        	    data.push({qid:qstId,oid:_.filter(data,{option_type:sas.option_type.normal}).length+1,option_type:option_type,option:""});   
+        	} 
+            }
+	 }
+	 data = _.sortBy(data,'oid');
+	 divOpt.innerHTML ="";
+	 _.forEach(_.filter(data,{option_type:option_type}) ,function(item,index){  
+	     if(delStatus){
+		 if (option_type == sas.option_type.etc){
+		     item.oid=99;
+		 }else{
+		     item.oid= index+1; 
+		 } 
+	     }
+	     var divOptionElement = document.createElement('div');
+	  /*   divOptionElement.setAttribute("class","container");*/
+	     var radioElement = sas.element.createInput(selectType,qstId,{option_value:""},null);
+	   /*  radioElement.setAttribute("class","optionRadio");*/
+	     var textElement =sas.element.createInput("text",item.oid,item,function(){ sas.eventBind.onNomalOptUpdateJson(item,this)});
+	     textElement.setAttribute("class","form-control optionText");
+	     divOptionElement.appendChild(radioElement);
+	     if (option_type == sas.option_type.normal){
+		 textElement.value = item.option;
+	     }
+	     divOptionElement.appendChild(textElement); 
+	     divOptionElement.appendChild(sas.element.createButton("삭제",function(){sas.onDeleteOptionElement(item)}));
+	     divOpt.appendChild(divOptionElement);
+	 });
+           
+	/* if(isEmptyEtc && option_type == sas.option_type.normal){ 
+	     sas.onAddMultipleChoice(qstId,data,sas.option_type.etc);
+	 }*/
+    },
+    onDeleteOptionElement:function(deleteItem){	  
+	var optionList= _.reject(_.find(sas.questions,{qid:deleteItem.qid}).option,deleteItem);
+	_.find(sas.questions,{qid:deleteItem.qid}).option =  optionList;
+	sas.onAddMultipleChoice(deleteItem.qid,  _.find(sas.questions,{qid:deleteItem.qid}) ,deleteItem.option_type,true);  
+    },
+    onDataBindHtml:function(data){
+        var divElement = document.createElement('div');
+        var divQuestionElement = document.createElement('div');
+        var buttonDiv = document.createElement("div");
+        var buttonSpan = document.createElement("span");
+        var buttonSpanLeft = document.createElement("span");
+        var buttonSpanRight = document.createElement("span"); 
+        divElement.setAttribute('class','divCard');
+        divElement.setAttribute("id","divCard"+data.qid);
+        divQuestionElement.setAttribute("id",'qst'+data.qid);
+        
+
+        buttonDiv.setAttribute("class","table-top-control");
+        buttonDiv.setAttribute("class","table-top-control");
+        buttonSpan.style.width="100%";
+        buttonSpanLeft.style.float='left'
+        buttonSpanRight.style.float='right'
+        
+        
+        _.forEach(sas.question_type,function(item){
+             console.log("REQUIRED",data)  
+            if(item.type =='DELETE'){
+        	  buttonSpanRight.appendChild(sas.element.createButton( item.name, function(){item.fn(data.qid,item.type)}))	  
+        	  
+              }else if(item.type == "REQUIRED"){
+        	  if (data.required_yn=="Y"){
+        	      item.name='필수'     
+        	  }else{
+        	      item.name='선택'
+        	  }
+        	 
+        	  buttonSpanLeft.appendChild(sas.element.createButton( item.name, function(){sas.eventBind.onRequired(data.qid,this)}))
+              }else{
+        	  buttonSpanLeft.appendChild(sas.element.createButton( item.name, function(){item.fn(data.qid,item.type)}))	  
+              }
+            
+            //divElement.appendChild(sas.element.createButton( item.name, function(){item.fn(data.qid,item.type)}));	
+        })
+      /*   buttonSpanLeft.appendChild(sas.element.createButton( item.name, function(){sas.eventBind.onRequired(data.qid,this)}))*/
+        buttonSpan.appendChild(buttonSpanLeft);
+        buttonSpan.appendChild(buttonSpanRight);
+        buttonDiv.appendChild(buttonSpan);
+        divElement.appendChild(buttonDiv);
+       
+   /*     divElement.appendChild(sas.element.createSelectScore(data.qid,"pageCnt",1,sas.pages.length,data.page_no,function(){sas.onPageRefresh(data,this)}));*/
+        var inputElement = document.createElement("input");
+        inputElement.setAttribute('class',"form-control required");
+        inputElement.setAttribute('type',"text");
+        inputElement.setAttribute('name',"question"+data.qid);
+        inputElement.value=  data.question;
+        inputElement.oninput = function(){ sas.eventBind.onNomalQstUpdateJson(data,this)}
+        divElement.appendChild(inputElement);
+        divElement.appendChild(divQuestionElement);    
+        $("#divQst").append(divElement);
+    },
+    onTextArea:function(qstId,type){
+        var divQst = document.querySelector("#qst"+qstId);
+        var currentQst  =_.find(sas.questions,{'qid':qstId});
+         
+        if(_.isEmpty(currentQst.question_type)||(currentQst.question_type!=type)){
+            divQst.innerHTML="";
+            currentQst.option =[];
+            currentQst.question_type = (type == "MODIFY" ? currentQst.question_type : type);
+            currentQst.option.push({qid:qstId,oid:1,option_type:sas.option_type.normal})
+            var divNormalOpt = document.createElement('div')
+            divNormalOpt.setAttribute("id","divNormalOpt"+qstId)
+            divNormalOpt.appendChild(sas.element.createTextArea("1",null))
+            divQst.appendChild(divNormalOpt);
+        }
+    },
+    onLineScore:function(qstId,type){
+        var divQst = document.querySelector("#qst"+qstId);
+        var currentQst  =_.find(sas.questions,{'qid':qstId});  
+        if(_.isEmpty(currentQst.question_type)||(currentQst.question_type!=type)){
+            divQst.innerHTML="";
+            currentQst.question_type=type;	
+            var divRange = document.createElement('div');
+            divRange.setAttribute("name","range");
+            var spenStartElement = document.createElement('span');
+            var spenEndElement = document.createElement('span');
+            
+            spenStartElement.textContent ='시작점수:';
+            spenEndElement.textContent ='종료점수:';	  
+            divRange.appendChild(spenStartElement);
+            divRange.appendChild(sas.element.createSelectScore(qstId,"startScore",0,1,1,function(){sas.onLienScoreOption(qstId)}));
+            divRange.appendChild(spenEndElement);
+            divRange.appendChild(sas.element.createSelectScore(qstId,"endScore",2,10,5,function(){sas.onLienScoreOption(qstId)}));
+            divQst.appendChild(divRange);
+            sas.onLienScoreOption(qstId);
+        }
+    },
+    onLienScoreOption(qstId){
+     
+	var divQst = document.querySelector("#qst"+qstId);
+	var removeElement = divQst.querySelectorAll("div");
+        if(removeElement.length ==2){
+            removeElement[1].remove();	  
+            removeElement[0].querySelector("[name='optionFL']").remove();
+            removeElement[0].querySelector("[name='optionLL']").remove();   
+        }
+        var startValue = divQst.querySelector("[name='startScore']").value;
+        var endValue = divQst.querySelector("[name='endScore']").value;
+        var currentQst  =_.find(sas.questions,{'qid':qstId});
+        currentQst.line_start = startValue;
+        currentQst.line_end = endValue;
+        currentQst.option =[];
+        currentQst.option.push({qid:qstId,option_type: sas.option_type.firstLabel,option:""})
+        currentQst.option.push({qid:qstId, option_type:sas.option_type.lastLabel,option:""})	
+        var divOpt = document.createElement('div')
+        var spenStartElement = document.createElement('span');
+        var spenEndElement = document.createElement('span');
+          
+        var firstElemnet =sas.element.createInput("text",sas.option_type.firstLabel, currentQst.option,function(){ sas.eventBind.onNomalOptUpdateJson( _.find(currentQst.option,{qid:qstId,option_type: sas.option_type.firstLabel}) ,this)});  
+        var lastElement =sas.element.createInput("text",sas.option_type.lastLabel, currentQst.option,function(){ sas.eventBind.onNomalOptUpdateJson( _.find(currentQst.option,{qid:qstId,option_type: sas.option_type.lastLabel}) ,this)});
+        firstElemnet.style.width="100px" 
+        firstElemnet.style.marginRight="5px"    		
+        lastElement.style.width="100px"
+          
+        removeElement[0].appendChild(firstElemnet);
+        removeElement[0].appendChild(lastElement);
+        
+       
+        divOpt.style.display='flex';
+        divOpt.style.justifyContent='space-between';
+        divOpt.style.alignItems='center';
+        divOpt.style.paddingLeft='300px';
+        divOpt.style.paddingRight='300px';
+        for (let i = startValue; i <= endValue; i++) {
+            currentQst.option.push({qid:qstId,oid:i,option_type:sas.option_type.lineOption});
+            var radioElement = sas.element.createInput("radio",i,currentQst.option,null);
+           /* radioElement.setAttribute("class","optionRadio");
+            radioElement.style.zoom='1.2';*/
+            divOpt.appendChild(radioElement);
+        }
+      
+        divQst.appendChild(divOpt)   
+    },
+    onTableQuestions:function(qstId,type){
+        var divQst = document.querySelector("#qst"+qstId);
+        var divRange = document.createElement('div');
+     /*   divRange.setAttribute("class","container");*/
+        var currentQst = _.find(sas.questions,{qid:qstId});
+        var divOptionElement = document.createElement('div');
+        var spenRowElement = document.createElement('span');
+        var spenColElement = document.createElement('span');
+        spenRowElement.textContent ='행:';
+        spenColElement.textContent ='열:';	
+        divOptionElement.setAttribute("name","tableQuestion"); 	  
+        if(_.isEmpty(currentQst.question_type)||(currentQst.question_type!=type)){
+            divQst.innerHTML="";
+            currentQst.question_type=type;
+            currentQst.option =[];
+            divRange.appendChild(spenRowElement);
+            divRange.appendChild(sas.element.createSelectScore(qstId,"rowCnt",1,20,1,function(){sas.onTableJsonToHtml(qstId)}));
+            divRange.appendChild(spenColElement);
+            divRange.appendChild(sas.element.createSelectScore(qstId,"colCnt",1,10,1,function(){sas.onTableJsonToHtml(qstId)}));
+            divQst.appendChild(divRange);
+            divQst.appendChild(divOptionElement);
+        }
+        
+       
+    },
+    onTableJsonToHtml:function(qstId){
+        var divQst = document.querySelector("#qst"+qstId);
+        var divTbl = divQst.querySelector("[name='tableQuestion']");
+        var currentQst = _.find(sas.questions,{qid:qstId});
+        var row = Number(divQst.querySelector("[name='rowCnt']").value);
+        var cell =Number( divQst.querySelector("[name='colCnt']").value);
+        currentQst.row_cnt = row;
+        currentQst.col_cnt = cell;
+        divTbl.innerHTML="";
+        currentQst.option = [];
+        var table = sas.element.createTable();	
+        
+        for (let i = 0;  i <= row ; i++) {
+            var tr = sas.element.createTableTr();
+            if(i==0){
+        	tr.appendChild(sas.element.createTableTh(null,null));	
+            }else{
+        	currentQst.option.push({qid:qstId,option_type: sas.option_type.tableRowLabel,rowno: i ,option:""});
+        	var currentOption =  _.find(currentQst.option,{qid:qstId,option_type: sas.option_type.tableRowLabel,rowno: i });
+        	tr.appendChild(sas.element.createTableTh(sas.element.createInput("text",sas.option_type.tableRowLabel,currentOption,function(){ sas.eventBind.onNomalOptUpdateJson( _.find(currentQst.option,{qid:qstId,option_type: sas.option_type.tableRowLabel,rowno: i }) ,this)}),null))	 
+            }
+            for (let j =1; j <= cell; j++) {
+                if (i==0){        
+                    currentQst.option.push({qid:qstId,option_type: sas.option_type.tableHeader,cellno:j ,option:""  });  
+                    tr.appendChild(sas.element.createTableTh(sas.element.createInput("text",sas.option_type.tableHeader,currentQst.option,function(){ sas.eventBind.onNomalOptUpdateJson( _.find(currentQst.option,{qid:qstId,option_type: sas.option_type.tableHeader,cellno:j}) ,this)}),null));
+                }else{
+                    currentQst.option.push({qid:qstId,option_type: sas.option_type.tableOption ,rowno: i  ,cellno:j ,option_value:"" }); 
+                    tr.appendChild(sas.element.createTableTd(sas.element.createInput(currentQst.select_type,sas.option_type.tableOption,currentQst.option,null),null));
+                }
+            } 				 
+            table.appendChild(tr);
+        }
+        console.log(table.outerHTML);
+        divTbl.appendChild(table); 		
+    },
+    onDivCardDelete:function(qstId){      
+	$("#divQst").html("");		
+        sas.questions = _.reject(sas.questions,{qid:qstId});          
+        _.forEach(sas.questions,function(item,index){
+              item.qid = index+1  
+           _.forEach(item.option,function(oitem){
+               oitem.qid = index+1
+           })
+            
+        })
+        sas.onEdit()
+    },
+    onCheckBox:function(id){
+     var qst =_.find(sas.questions,{qid:id})
+     	qst.select_type ='checkbox'
+     	sas.onEdit();
+    },
+    onRadio:function(id){
+	var qst = _.find(sas.questions,{qid:id})
+	  qst.select_type ='radio'
+	  sas.onEdit();
+    },
+    onPreview:function(){
+	$("#divQst").html("");	
+	_.forEach(sas.pages,function(page){
+	    var divPageElement = document.createElement('div');;
+	    divPageElement.setAttribute('class','divPage');
+	    divPageElement.setAttribute("id","divPage"+page.page_no);	  
+	    divPageElement.innerText= page.question
+	    $("#divQst").append(divPageElement);    
+	    _.forEach(_.filter(sas.questions,{page_no:page.page_no}) ,function(qst){
+		    var divElement = document.createElement('div');
+	            divElement.setAttribute('class','divCard');
+	            divElement.setAttribute("id","divCard"+qst.qid);
+//	            divElement.innerText = qst.question;
+	            divElement.append(sas.element.createQst(qst));
+	            divElement.append( sas.view[qst.question_type](qst));  
+	            $("#divQst").append(divElement);	
+	    })	
+	})
+    },	
+    onEdit:function(){	
+	$("#divQst").html("");	
+	
+	_.forEach(sas.pages,function(page){
+	    var divElement = document.createElement('div');
+	    divElement.setAttribute('class','divCard');
+	    divElement.setAttribute("id","divPage"+page.page_no);	  
+	    var inputElement = document.createElement("input");
+	    inputElement.setAttribute('name',"page"+page.page_no);
+	    inputElement.setAttribute('class',"form-control");
+	    inputElement.style.width='87%';
+	    inputElement.oninput = function(){page.question = this.value};
+	    inputElement.value = page.question
+	    divElement.append(inputElement);
+	    var qstBtn =sas.element.createButton("질문추가",function(){sas.onAddQuestion(page.page_no)})
+	    qstBtn.style.marginLeft='5px'
+	    var qstDelBtn =sas.element.createButton("단락삭제",function(){sas.onPageDelete(page.page_no)})
+	    qstDelBtn.style.marginLeft='5px' 
+	    divElement.append(qstBtn);
+	    divElement.append(qstDelBtn);
+		
+	     $("#divQst").append(divElement);    
+	    _.forEach(_.filter(sas.questions,{page_no:page.page_no}) ,function(qst){
+		sas.onDataBindHtml(qst); 
+             if (!_.isEmpty(qst.question_type)){
+        	 sas.edit[qst.question_type](qst) 
+             }	
+		
+	    })	
+	})
+	
+	/*   const draggables = document.querySelectorAll(".draggable")
+	   draggables.forEach(function(draggble){addDraggableLinstners(draggble)});  */
+		
+    },
+    onPageDelete:function(pageNo){
+	sas.pages = _.reject(sas.pages,{page_no:pageNo})
+	sas.questions =_.reject(sas.questions,{page_no:pageNo})
+	 var currentPageNo = "";
+	 _.forEach(sas.pages,function(item,index){
+	     currentPageNo = item.page_no ;
+	     item.page_no = index+1  
+           _.forEach(_.filter(sas.questions,{page_no:currentPageNo}),function(oitem){
+               oitem.page_no = item.page_no;
+           })     
+       }) 
+       sas.onEdit()
+	
+    },
+    onPageRefresh:function(qst,pageNo){
+	  qst.page_no = pageNo.value
+	  sas.questions =_.sortBy( sas.questions,'page_no');    
+        _.forEach(sas.questions,function(item,index){
+              item.qid = index+1  
+           _.forEach(item.option,function(oitem){
+               oitem.qid = index+1
+           })
+            
+        })
+	sas.onEdit();
+	
+    },
+    view:{
+	TABLE:function(qst){
+	    var divOpt = document.createElement('div');
+	    divOpt.setAttribute("class","divOptions")
+	    var opt = qst.option; 
+	    divOpt.setAttribute("name","tableQuestion");	  
+	    var table = sas.element.createTable();	
+	    var headerTr = sas.element.createTableTr();
+	    var header = _.filter(opt,{option_type: sas.option_type.tableHeader}); 	
+	    var rowArray = _.filter(opt,{option_type: sas.option_type.tableRowLabel}); 	
+	    var colArray = _.filter(opt,{option_type: sas.option_type.tableOption}); 	
+	    headerTr.appendChild(sas.element.createTableTh(null,null));	
+	    _.forEach(_.filter(opt,{option_type: sas.option_type.tableHeader}), function(col,index){ 
+		headerTr.appendChild(sas.element.createTableTh(null,col.option));
+	    });
+	    table.appendChild(headerTr);
+	    _.forEach(rowArray, function(row,index){
+		var tr = sas.element.createTableTr();
+		tr.appendChild(sas.element.createTableTh(null,row.option));	
+		_.forEach(_.filter(colArray,{rowno:row.rowno}), function(col,index){
+		    
+		    var radioElement = sas.element.createInput(qst.select_type,sas.option_type.tableOption+qst.qid+'_'+row.rowno,col,function(){ sas.eventBind.onTableOptUpdateJson(qst,col,this)});
+		   /* if (qst.required_yn){
+			 radioElement.setAttribute('class',"form-control required");
+		    }*/
+		  /*  radioElement.style.zoom='1.5';*/
+		  /*  if (col.option_value =="Y"){
+			radioElement.setAttribute("checked",true);
+		    }*/
+
+		    tr.appendChild(sas.element.createTableTd(radioElement,null));
+		});  
+		table.appendChild(tr);   			  
+	    });
+	   
+	    divOpt.appendChild(table);
+	    return divOpt;
+	},
+	TEXT:function(qst){
+	    var opt = qst.option[0]; 
+	    var divOpt = document.createElement('div');
+	    divOpt.setAttribute("class","divOptions")
+	    var divNormalOpt = document.createElement('div')
+	    divNormalOpt.setAttribute("id","divNormalOpt"+opt.qid)
+	    var textAreaElement = sas.element.createTextArea("1",function(){sas.eventBind.onTextUpdateJson(opt,this)})
+	    textAreaElement.textContent = opt.text_value;
+	    /*if (qst.required_yn){
+		textAreaElement.setAttribute('class',"form-control required");
+	    }*/
+	    divNormalOpt.appendChild(textAreaElement)
+	    divOpt.appendChild(divNormalOpt);	  
+	    return divOpt;
+	    
+	    
+	},
+	MULT:function(qst){
+	    var divOpt = document.createElement('div');
+	    divOpt.setAttribute("class","divOptions")
+	    var opt = qst.option; 
+	    _.forEach(opt,function(item){
+		var divOptionElement = document.createElement('div');
+		/*divOptionElement.setAttribute("class","container");*/
+		var radioElement = sas.element.createInput(qst.select_type,item.qid,item,function(){ sas.eventBind.onMultOptUpdateJson(qst,item,this)});
+		/*radioElement.setAttribute("class","option-radio"); */
+		/*if (qst.required_yn){
+		    radioElement.setAttribute('class',"form-control required");
+		 }*/
+
+		if (item.option_value =="Y"){
+		    radioElement.setAttribute("checked",true);
+		}
+		if(item.option_type == sas.option_type.etc){
+		    divOptionElement.appendChild(radioElement);
+		    var textElement = sas.element.createInput("text",item.oid,item,function(){ sas.eventBind.onTextUpdateJson(item,this)})
+		    textElement.value = item.text_value;
+		    divOptionElement.appendChild(textElement);  		   
+		}else{
+		    divOptionElement.appendChild(radioElement);
+		    divOptionElement.appendChild( sas.element.createSpan(item.option)) ;   
+		} 
+		divOpt.appendChild(divOptionElement);
+	    })
+	    return divOpt;
+	},
+	LINE:function(qst){
+	    var opt = qst.option; 
+	    var divOpt = document.createElement('div');
+	    divOpt.setAttribute("class","divOptions")
+	    var firstName = _.find(opt,{option_type:sas.option_type.firstLabel}).option
+	    var listName  = _.find(opt,{option_type:sas.option_type.lastLabel}).option
+	    var lineOption = _.filter(opt,{option_type:sas.option_type.lineOption})
+	    divOpt.appendChild(sas.element.createSpan(firstName));
+	        divOpt.style.display='flex';
+	        divOpt.style.justifyContent='space-between';
+	        divOpt.style.alignItems='center';
+	        divOpt.style.paddingLeft='300px';
+	        divOpt.style.paddingRight='300px';
+	        divOpt.style.paddingTop='20px';
+	        divOpt.style.paddingBottom='20px';
+	    _.forEach(lineOption,function(item,index){
+		var radioElement = sas.element.createInput("radio",item.qid,item,function(){ sas.eventBind.onLineOptUpdateJson(qst,item)})
+		radioElement.append(Number(qst.line_start)+index);
+		/*radioElement.setAttribute("class","optionRadio");*/
+		/*if (qst.required_yn){
+		    radioElement.setAttribute('class',"form-control required");
+		 }
+		radioElement.style.zoom='1.5';*/
+		if (item.option_value =="Y"){
+		    radioElement.setAttribute("checked",true);
+		}
+		 divOpt.setAttribute("class","mt-radio-inline")
+		divOpt.appendChild(radioElement);
+	    })
+	    divOpt.appendChild(sas.element.createSpan(listName));
+	    return divOpt;
+	},
+    },
+    edit:{
+	TABLE:function(qst){
+	         console.log('edit.TABLE',qst)
+	        var divQst = document.querySelector("#qst"+qst.qid);
+	        var divRange = document.createElement('div');
+	     /*   divRange.setAttribute("class","container");*/
+	        var spenRowElement = document.createElement('span');
+	        var spenColElement = document.createElement('span');
+	        spenRowElement.textContent ='행:';
+	        spenColElement.textContent ='열:';
+	     
+	        var divOptionElement = document.createElement('div');
+	        divOptionElement.setAttribute("name","tableQuestion"); 	 
+	        divRange.appendChild(spenRowElement);
+	        divRange.appendChild(sas.element.createSelectScore(qst.qid,"rowCnt",1,20,qst.row_cnt,function(){sas.onTableJsonToHtml(qst.qid)}));
+	        divRange.appendChild(spenColElement);
+	        divRange.appendChild(sas.element.createSelectScore(qst.qid,"colCnt",1,10,qst.col_cnt,function(){sas.onTableJsonToHtml(qst.qid)}));
+	        divQst.appendChild(divRange);
+	        divQst.appendChild(divOptionElement);
+	   
+	        var divTbl = divQst.querySelector("[name='tableQuestion']");
+	  /*      var rowArray = _.filter(opt,{option_type: sas.option_type.tableRowLabel}); 	
+		var colArray = _.filter(opt,{option_type: sas.option_type.tableOption}); */	
+	        
+	        var row = Number(divQst.querySelector("[name='rowCnt']").value);
+	        var cell =Number( divQst.querySelector("[name='colCnt']").value);
+	        var table = sas.element.createTable();	
+	         
+	        
+	        var trHead = sas.element.createTableTr();
+	        trHead.appendChild(sas.element.createTableTh(null,null));
+	        _.forEach(_.filter(qst.option,{option_type: sas.option_type.tableHeader}),function(item,index){
+	            
+	            
+                    var colLabelInput =sas.element.createInput("text",item.option_type,item,function(){ sas.eventBind.onNomalOptUpdateJson( item ,this)});
+                    colLabelInput.value = item.option
+	            trHead.appendChild(sas.element.createTableTh(colLabelInput,null))	 
+	        
+	        })
+	         table.appendChild(trHead);
+	        
+	        _.forEach(_.filter(qst.option,{option_type: sas.option_type.tableRowLabel}),function(item,index){
+	            var tr = sas.element.createTableTr();    
+	            
+                    var rowLabelInput =sas.element.createInput("text",item.option_type,item,function(){ sas.eventBind.onNomalOptUpdateJson( item ,this)});
+                    rowLabelInput.value = item.option
+	            tr.appendChild(sas.element.createTableTh(rowLabelInput,null));	 
+	             
+	            
+	            _.forEach(_.filter(qst.option,{option_type: sas.option_type.tableOption,rowno:item.rowno}),function(item,index){
+	        	 tr.appendChild(sas.element.createTableTd(sas.element.createInput(qst.select_type,sas.option_type.tableOption,item,null),null));
+	             })
+	        
+	            table.appendChild(tr);
+	        })
+
+	        divTbl.appendChild(table); 
+	},
+	TEXT:function(qst){	
+	    var divQst = document.querySelector("#qst"+qst.qid);
+	    var divOpt = document.createElement('div');
+	    var divNormalOpt = document.createElement('div')
+	    divNormalOpt.setAttribute("id",sas.option_type.normal+qst.option[0].oid)
+	    divNormalOpt.appendChild(sas.element.createTextArea("1",null))
+	    divOpt.appendChild(divNormalOpt);  
+	  /*  return divOpt;*/
+	    divQst.appendChild(divOpt);
+	},
+	MULT:function(qst){
+	    var divQst = document.querySelector("#qst"+qst.qid);
+	    var divNormalOpt = document.createElement('div')
+		divNormalOpt.setAttribute("id","NORMAL"+qst.qid)
+		var divEtcOpt= document.createElement('div')
+		divEtcOpt.setAttribute("id","ETC"+qst.qid)
+		divQst.appendChild(divNormalOpt);
+		divQst.appendChild(divEtcOpt);
+		var btnAdd = sas.element.createButton("옵션추가",function(){sas.onAddMultipleChoice(qst.qid,qst,sas.option_type.normal,false)})
+		var btnEtc = sas.element.createButton("기타추가",function(){sas.onAddMultipleChoice(qst.qid,qst,sas.option_type.etc,false)})
+		btnEtc.style.marginLeft ='5px';
+		divQst.appendChild(btnAdd);	
+		divQst.appendChild(btnEtc);	
+
+		_.forEach(qst.option ,function(item,index){  
+		    var divOpt =document.querySelector("#"+item.option_type+qst.qid);     
+		    var divOptionElement = document.createElement('div');
+		  /*  divOptionElement.setAttribute("class","container"); */
+		    var divOptionElement = document.createElement('div');
+		 /*   divOptionElement.setAttribute("class","container");*/
+		    var radioElement = sas.element.createInput(qst.select_type,qst.qid,item,null);
+		 /*   radioElement.setAttribute("class","optionRadio");*/
+		    var textElement =sas.element.createInput("text",item.oid,item,function(){ sas.eventBind.onNomalOptUpdateJson(item,this)});
+		    textElement.setAttribute("class","form-control optionText");
+		    divOptionElement.appendChild(radioElement);
+		    if (item.option_type == sas.option_type.normal){
+			textElement.value = item.option;
+		    }
+		    divOptionElement.appendChild(textElement); 
+		    divOptionElement.appendChild(sas.element.createButton("삭제",function(){sas.onDeleteOptionElement(item)}));
+		    divOpt.appendChild(divOptionElement);
+		})             
+	},
+	LINE:function(qst){		
+	    var divQst = document.querySelector("#qst"+qst.qid);	
+	    var divRange = document.createElement('div');
+            divRange.setAttribute("name","range");
+            var spenStartElement = document.createElement('span');
+            var spenEndElement = document.createElement('span');
+            spenStartElement.textContent ='시작점수:';
+            spenEndElement.textContent ='종료점수:';	  
+            divRange.appendChild(spenStartElement);
+            divRange.appendChild(sas.element.createSelectScore(qst.qid,"startScore",0,1,1,function(){sas.onLienScoreOption(qst.qid)}));
+            divRange.appendChild(spenEndElement);
+            divRange.appendChild(sas.element.createSelectScore(qst.qid,"endScore",2,10,5,function(){sas.onLienScoreOption(qst.qid)}));
+	    var divOpt = document.createElement('div')
+	   /* divOpt.setAttribute("class","container");*/
+	    var firstData = _.find(qst.option,{option_type:sas.option_type.firstLabel})
+	    var lastData  = _.find(qst.option,{option_type:sas.option_type.lastLabel})
+
+            var firstElemnet =sas.element.createInput("text",sas.option_type.firstLabel,firstData,function(){ sas.eventBind.onNomalOptUpdateJson(firstData,this)})
+            var lastElement =sas.element.createInput("text",sas.option_type.lastLabel,lastData,function(){ sas.eventBind.onNomalOptUpdateJson(lastData,this)})
+             firstElemnet.style.width="100px" 
+             firstElemnet.style.marginRight="5px"    
+             lastElement.style.width="100px"
+	    
+	    divRange.appendChild(firstElemnet);
+	    divRange.appendChild(lastElement); 
+	    divQst.appendChild(divRange);  
+	    divOpt.setAttribute("class","mt-radio-inline")
+	   
+	    
+	        divOpt.style.display='flex';
+	        divOpt.style.justifyContent='space-between';
+	        divOpt.style.alignItems='center';
+	        divOpt.style.paddingLeft='300px';
+	        divOpt.style.paddingRight='300px';
+	     
+	    _.forEach(_.filter(qst.option,{option_type:sas.option_type.lineOption}),function(item){
+		var radioElement = sas.element.createInput("radio",item.oid,item,null);
+		/*radioElement.setAttribute("class","optionRadio");
+		radioElement.style.zoom='1.2';*/
+	        divOpt.appendChild(radioElement);
+	    })
+	  
+	    divOpt.firstChild.value = firstData.option;
+	    divOpt.lastChild.value = lastData.option;
+	    divQst.appendChild(divOpt)   
+	        
+	},
+    },	  
+    eventBind:{
+	onNomalQstUpdateJson:function(qst,el){
+	    qst.question = el.value
+	},
+	onNomalOptUpdateJson:function(opt,el){
+	    opt.option=el.value;
+	},
+	onLineQstUpdateJson:function(){  	 
+		 
+	},
+	onTableQstUpdateJson:function(){
+	 
+	},
+	onMultOptUpdateJson:function(qst,optitem,el){
+	   var opt = qst.option;
+	    if(qst.select_type == "radio"){
+   		 _.forEach( opt,function(item){
+   		     item.option_value ="";
+   		 })	
+   		 optitem.option_value ="Y"
+   		/* console.log("onTableOptUpdateJson==Y",optitem)*/     
+	    }else if (qst.select_type=="checkbox"){
+		 if (el.checked){
+		   optitem.option_value="Y"	     
+		 }else{
+		    optitem.option_value=""
+		 }
+	     }
+	   /* if(optitem.option_type == sas.option_type.etc){
+		optitem.text_value =  el.value
+	    }*/
+	    
+	    
+	},
+	onTextUpdateJson:function(optitem,el){
+	    optitem.option_value="Y"	
+	    optitem.text_value =  el.value
+	},
+	
+	onLineOptUpdateJson:function(qst,optitem){
+	    var opt= qst.option;
+	    _.forEach( opt,function(item){
+		item.option_value ="";
+	    })
+	   
+	   optitem.option_value="Y"
+	},
+	
+	
+	onTableOptUpdateJson:function(qst,optitem,el){
+	    var opt= _.filter(qst.option,{rowno:optitem.rowno});
+	    var select_type= qst.select_type;
+	    
+	    if(qst.select_type == "radio"){
+    		 _.forEach( opt,function(item){
+    		     item.option_value ="";
+    		 })	
+    		 optitem.option_value ="Y"
+    		 console.log("onTableOptUpdateJson==Y",optitem)     
+	     }else if (qst.select_type=="checkbox"){
+		 if (el.checked){
+		   optitem.option_value="Y"	     
+		 }else{
+		    optitem.option_value=""
+		 }
+	     }
+	},
+	
+	onLineOptUpdateJson:function(qst,optitem){
+	    var opt= qst.option;
+	    _.forEach( opt,function(item){
+		item.option_value ="";
+		/*if (opt.oid == optitem.oid){
+		    item.value ="Y";   
+		}*/
+	   })
+	   
+	   optitem.option_value="Y"
+	},
+	onRequired:function(qstId,el){
+	   var qst = _.find(sas.questions,{qid:qstId}) ;
+	    if(qst.required_yn == "Y"){
+	      qst.required_yn ="N"
+              el.innerText="선택"
+	   }else{
+	       qst.required_yn = "Y"
+	       el.innerText="필수"
+	   }
+	}
+    },	  
+    element:{ 
+	createQst:function(qst){  
+	    var divQuestionElement = document.createElement('div')
+	    divQuestionElement.setAttribute("id",'qst'+qst.qid)
+	    divQuestionElement.setAttribute("class",'bg-default bg-font-default')
+	    divQuestionElement.style.padding="10px"
+	    divQuestionElement.innerText = qst.question;
+	    return divQuestionElement;
+	},
+	createButton:function(name,func){	
+	    var buttonElement = document.createElement('button');
+	    buttonElement.setAttribute('type','button');
+	    if (name=='삭제'|| name=='단락삭제'){
+		buttonElement.setAttribute('class',' btn red');
+	    }else{
+		if(name=="객관식"){buttonElement.style.marginLeft='0px'}
+		buttonElement.setAttribute('class',' btn blue');
+	    }
+	    buttonElement.textContent= name
+	  	/* if(!_.isEmpty(func)){ */
+	    buttonElement.onclick= func;	
+	  	/* } */
+	    return buttonElement;
+	} ,
+	createInput:function(inputType,name,item,func){
+	    var inputElement = document.createElement("input");
+	 
+	    inputElement.setAttribute('type',inputType);
+	    inputElement.setAttribute('name',"option"+name);
+	
+	     if(inputType=='radio'|| inputType=='checkbox'){
+		 var labelElement = document.createElement("label");
+		 inputElement.setAttribute('name',"option"+name);
+		 if (item.option_value =="Y"){
+		      inputElement.setAttribute("checked",true);
+		 }
+		 if (typeof func == "function"){    	   
+			inputElement.oninput =  func ;
+		 }
+		 labelElement.setAttribute('class',' mt-'+inputType +' mt-'+inputType+'-outline');
+		 labelElement.appendChild(inputElement);
+		 labelElement.appendChild(document.createElement("span"));
+		 inputElement = labelElement;
+		/*console.log("createInput", item)*/
+		
+	   
+	     }else 
+		 if(name=='99'){
+		inputElement.setAttribute('class',"form-control");
+		inputElement.setAttribute('readonly',true);
+		inputElement.setAttribute('placeholder','기타');
+	      }else if(inputType=="text"){
+		   inputElement.setAttribute('class',"form-control");
+		  if(name=='FL'){
+		      inputElement.setAttribute('placeholder','시작이름');    
+		  }else if(name=='LL'){
+		      inputElement.setAttribute('placeholder','종료이름');
+		  }else if(name=='RL'){
+		      inputElement.setAttribute('placeholder','행이름');    
+		  }else if(name=='TH'){
+		      inputElement.setAttribute('placeholder','열이름');        
+		  }else{
+		      inputElement.setAttribute('placeholder','옵션'+name);    
+		  }
+		   if (typeof func == "function"){    	   
+			inputElement.oninput =  func ;
+		   }
+	      }
+	    
+	 
+	    return inputElement;
+    	},
+    	createTextArea:function(name,func){
+    	    var inputElement = document.createElement("textarea");
+    	    inputElement.setAttribute('class',"form-control");
+    	    inputElement.setAttribute('name',"option"+name);
+    	    inputElement.style.marginTop ='5px';
+    	    if (typeof func == "function"){    	   
+		inputElement.oninput =  func ;
+	    }
+    	    return inputElement;
+    	} ,
+    	createSelectScore:function(qstId,name,startValue,endValue,def,func){
+    	    var selectElement = document.createElement("select");
+    	    selectElement.setAttribute('class',"form-control optionSelect ");  
+    	    selectElement.setAttribute('name',name);
+    	    if(func!=null){
+    		selectElement.onchange = func;   
+    	    }
+    	    for(var i=startValue; i <=endValue ; i++){
+    		var option = document.createElement("option");
+    		option.value = i;
+    		option.text = i;
+    		if(def==i){
+    		    option.selected = true;
+    		}
+    		
+    		
+    		selectElement.appendChild(option);
+    	    }
+    	    return selectElement;
+    	} ,
+    	createTable:function(){
+    	    var tableElement = document.createElement("table");
+    	    tableElement.setAttribute("class","table");
+    	    tableElement.style ="border: 1px solid #e7ecf1; width:100%; margin:0px";
+    	    return tableElement
+    	 },
+    	 createTableTr:function(){
+    	     var trElement = document.createElement("tr");
+    	     return trElement;
+    	 },
+    	 createTableTh:function(element,text){
+    	     var thElement = document.createElement("th");
+    	         thElement.setAttribute("class","t-center");
+    	     if (element!=null){thElement.appendChild(element);}
+    	     	if (text!=null){thElement.innerText= text;}
+    	     return  thElement;    
+    	 },
+    	 createTableTd:function(element,text){
+    	     var tdElement = document.createElement("td");
+    	     	 tdElement.setAttribute("class","t-center");
+    	     	 tdElement.style.verticalAlign="middle";
+    	     if (element!=null){tdElement.appendChild(element);}
+	    	/* tdElement.appendChild(); */
+    	     return tdElement;
+    	 },
+    	 createSpan:function(text){
+    	     var spanElement = document.createElement("span");
+    	     spanElement.innerText= text;
+    	     return spanElement;
+    	 },
+    },			
+} 
+
+  
+  /* const container  = document.getElementById("divQst")
+ 
+ function handleDragStart(e){    
+    console.log("handleDragStart")
+    e.dataTransfer.effectAllowed='move'
+    e.dataTransfer.setData("text/plan",this.innerHtml);	
+    this.classList.add('dragging')
+ }
+
+ function handleDragOver(e){
+     console.log("handleDragOver")
+   if(e.preventDefault){
+      e.preventDefault(); 
+   }
+   this.classList.add('over');
+   e.dataTransfer.dropEffect='move'
+   return false    
+ }
+ 
+ function handleDragEnter(e){
+     console.log("handleDragEnter")
+     this.classList.add("over")
+ }
+ 
+ function handleDragLeave(e){
+     console.log("handleDragLeave")
+   this.classList.add("over")  
+ }
+
+ function handleDrop(e){
+     console.log("handleDrop")
+   if(e.stopPropagation){
+       e.stopPropagation();
+   }   
+  
+     const draggables = document.querySelectorAll(".draggable")
+     draggables.forEach(function(draggble){draggble.classList.remove('over'); draggble.classList.remove('dragging')});  
+   return false 
+ }
+ 
+ function handleDragEnd(e){
+   this.classList.remove('over');
+  
+ }
+ 
+ function addDraggableLinstners(elem){
+     elem.addEventListener("dragstart",handleDragStart,false);
+     elem.addEventListener("dragenter",handleDragEnter,false);
+     elem.addEventListener("dragover",handleDragOver,false);
+     elem.addEventListener("dragleave",handleDragLeave,false);
+     elem.addEventListener("dragdrop",handleDrop,false);
+     elem.addEventListener("dragend",handleDragEnd,false);
+ }*/
+ 

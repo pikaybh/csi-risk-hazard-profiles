@@ -1,0 +1,30 @@
+var UIModals = function () {
+
+    var handleModals = function () {
+    	if($("#draggable").length != 0){//오류 수정 kjk 20200701
+    		$("#draggable").draggable({
+    	            handle: ".modal-header"
+	        });
+	        $("#draggable_static_A").draggable({
+	            handle: ".modal-header"
+	        });
+	        $("#draggable_static_B").draggable({
+	            handle: ".modal-header"
+	        });
+    	}
+       
+    }
+
+    return {
+        //main function to initiate the module
+        init: function () {
+            handleModals();
+        }
+
+    };
+
+}();
+
+jQuery(document).ready(function() {    
+   UIModals.init();
+});

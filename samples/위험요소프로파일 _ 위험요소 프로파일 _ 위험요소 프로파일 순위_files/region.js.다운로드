@@ -1,0 +1,114 @@
+
+var regionArray =[];
+var regionLvl1 = JSON.parse(localStorage.getItem("regionLvl1"));
+var regionLvl2 = JSON.parse(localStorage.getItem("regionLvl2"));
+var returnArray = [];    
+function getRegionString(){
+	 returnArray = [];
+	_.forEach(regionArray,function(item){
+		returnArray.push(item.region_cd);
+	})
+
+	$("#region").val( returnArray.toString());
+}
+
+function onRegionSelect(event){
+	
+	 var region_cd = ""
+		 
+	 if(event == "00"){ 
+		 region_cd = "00"	
+	 }else {
+		 region_cd  = event.target.value 
+	 }
+	  var regionLvl2 = _.filter(JSON.parse(localStorage.getItem("regionLvl2")),{upper_region_cd:region_cd}); 
+	  var regionLvl2Html =""; 
+	  var regionLvl1 = _.find(JSON.parse(localStorage.getItem("regionLvl1")),{region_cd:region_cd}); 
+	  console.log("regionLvl1",regionLvl1);
+	/*  if (region_cd != "00"){
+		  regionLvl2Html += "<option value ='"+ regionLvl1.region_cd+"'>"+regionLvl1.region_nm+" 전체 </option>"; 
+	  } */
+	  _.forEach(regionLvl2,function(item){
+
+		regionLvl2Html += "<option value ='"+ item.region_cd+"'>"+item.region_nm+"</option>"; 
+		
+	  });
+	 $("#regionLvl2").html(regionLvl2Html);
+} 
+
+
+function onSelected(){
+	var selectCd  = $("#regionLvl2").val();
+	var selectItem = null;
+	
+		if (selectCd == "00"){ 
+			 regionArray = [];
+			 selectItem =  _.find(regionLvl2,{region_cd:selectCd});
+			 $("#selectRegion").html("<button type='button' class='region_btn' onclick='onSelectCancel(\""+selectItem.region_cd+"\")' >"+selectItem.region_nm +"<img src='/com/img/common/icon/ico_btn_cancel.png' alt='icon'></button>");
+			 regionArray.push(selectItem) ; 
+		  return;
+		}
+		
+		if(selectCd.length == 2){
+			regionArray = _.reject(regionArray,{region_cd:"00"})
+			regionArray = _.reject(regionArray,{upper_region_cd:selectCd})
+			selectItem =  _.find(regionLvl2,{region_cd:selectCd});
+			regionArray.push(selectItem);
+			regionArray =_.sortedUniqBy(regionArray,'region_cd') ; 
+		
+		}else{
+			regionArray = _.reject(regionArray,{region_cd:"00"})
+			regionArray = _.reject(regionArray,{region_cd:selectCd})	
+			selectItem =  _.find(regionLvl2,{region_cd:selectCd});
+			regionArray = _.reject(regionArray,{region_cd:selectItem.upper_region_cd})
+			regionArray.push(selectItem);
+			regionArray =_.sortedUniqBy(regionArray,'region_cd') ; 
+				
+		}
+		
+		$("#selectRegion").html("");
+		_.forEach(regionArray,function(item){
+			$("#selectRegion").append("<button type='button' class='region_btn' onclick='onSelectCancel(\""+item.region_cd+"\")' >"+item.region_nm +"<img src='/com/img/common/icon/ico_btn_cancel.png' alt='icon'></button>");
+	     });	
+		
+}
+
+
+function onSelectCancel(selectCd){
+	regionArray = _.reject(regionArray,{region_cd:selectCd})
+	$("#selectRegion").html("");
+	_.forEach(regionArray,function(item){
+		$("#selectRegion").append("<button type='button' class='region_btn' onclick='onSelectCancel(\""+item.region_cd+"\")' >"+item.region_nm +"<img src='/com/img/common/icon/ico_btn_cancel.png' alt='icon'></button>");
+	  });
+}	
+
+function onRegionInit(){
+	var  regionLvl1Html ="";
+	_.forEach(regionLvl1,function(item){
+		
+		   regionLvl1Html += "<option value ='"+ item.region_cd+"'>"+item.region_nm+"</option>";
+		});
+		 $("#regionLvl1").html(regionLvl1Html);
+		 onRegionSelect("00")
+}	
+
+function onRegionResult(){
+	$("#selectRegion").html('');
+	_.forEach(regionArray,function(item){
+		$("#selectRegion").append("<button type='button' class='region_btn' onclick='onSelectCancel(\""+item.region_cd+"\")' >"+item.region_nm +"<img src='/com/img/common/icon/ico_btn_cancel.png' alt='icon'></button>");
+	});
+}
+
+function onRegionStringToObject(selectRegion){
+	regionArray =[];  
+	if (!_.isEmpty(selectRegion)){
+      var selectArray = selectRegion.split(",");  
+		_.forEach(selectArray,function(item){
+			selectItem =  _.find(regionLvl2,{region_cd:item});
+			regionArray.push(selectItem);
+			$("#selectRegion").append("<button type='button' class='region_btn' onclick='onSelectCancel(\""+selectItem.region_cd+"\")' >"+selectItem.region_nm +"<img src='/com/img/common/icon/ico_btn_cancel.png' alt='icon'></button>");
+		 });
+	  }
+}
+
+

@@ -1,0 +1,411 @@
+var ca = 0;
+var cb = 0;
+
+function countA() {
+	ca++;
+} 
+
+function countB() {
+	cb++;
+}
+
+var cro_common ={
+	 personal_area:{
+		makePersonalPilotHtml:function(){ //조종사 관련 (구인,구직)
+			let html ='';
+			html  +='<div class="w_100p" style="display:inline-block;">';
+			html  +='<span style="font-size: 14px;">※ 아래와 같이 개인정보를 수집·이용하는데 동의하십니까?<br/><a style="float: right;" OnClick="javascript:countA();" id="personal_info_text" href="#personal_info_area" data-toggle="personal_info" class="link-tel"><strong style="color:blue;">(펼치기)</strong></a></span>';
+			html  +='<div style="margin-top: 10px;height: 35px;" class="radio_item w_100p">';
+			html  +='<div class="checks" style="margin-bottom: 1px;">';
+			html  +='<input type="radio" id="personal_info_y" name="person_info_yn" class="required" title="개인정보 수집 동의 여부" value="Y" >';
+			html  +='<label for="personal_info_y">동의</label>';
+			html  +='</div>';
+			html  +='</div>';
+			html  +='<div class="radio_item w_100p" style="height: 35px;">';
+			html  +='<div class="checks" style="margin-bottom: 1px;">';
+			html  +='<input type="radio" id="personal_info_n" name="person_info_yn" class="required" title="개인정보 수집 동의 여부" value="N" checked>';
+			html  +='<label for="personal_info_n">미동의(미동의 시 등록신청이 불가능합니다.)</label>';
+			html  +='</div>';
+			html  +='</div>';
+			html  +='</div>';
+			html  +='<div id="personal_info_area" style="display: none;padding:5px;font-size: 14px;border: 1px solid #000000;background-color:#f4f5f5;">';
+			html  +='<p>';
+			html  +='■ 「개인정보보호법」 제15조(개인정보의 수집·이용)<br/>';
+			html  +='&nbsp;① 개인정보처리자는 다음 각 호의 어느 하나에 해당하는 경우에는 개인정보를 수집할 수 있으며 그 수집 목적의 범위에서 이용할 수 있다.<br/>';
+			html  +='&nbsp;&nbsp;1. 정보주체의 동의를 받은 경우<br/>';
+			html  +='&nbsp;&nbsp;2. 법률에 특별한 규정이 있거나 법령상 의무를 준수하기 위하여 불가피한 경우<br/><br/>';
+			html  +='■ 개인정보 수집·이용 안내<br/>';
+			html  +='&nbsp;1, 수집하는 개인정보의 항목 <br/>';
+			html  +='&nbsp;&nbsp;‘건설기계 e-마당’은 「직업안정법 시행령」 제28조에 따라 아래와 같은 개인정보를 수집하고 있습니다.<br/>';
+			html  +='&nbsp;&nbsp;&nbsp;<strong style="color:blue;">- 필수정보 : 휴대전화번호, 전화번호, 이메일주소</strong><br/>';
+			html  +='&nbsp;2, 개인정보의 수집 이용목적<br/>';
+			html  +='&nbsp;&nbsp;‘건설기계 e-마당’에서 수집한 개인정보는 「직업안정법 시행령」 제28조제2호에 따라 구인·구직의 광고활용을 위해 활용됩니다.<br/>';
+			html  +='&nbsp;3. 개인정보의 보유 및 이용기간<br/>';
+			html  +='&nbsp;&nbsp;1) ‘건설기계 e-마당’은 법령에 따른 개인정보 보유이용기간 또는 정보주체로부터 개인정보를 수집 시에 동의 받은 개인정보 보유, 이용기간 내에서 개인정보를 처리, 보유합니다.<br/>';
+			html  +='&nbsp;&nbsp;2) 개인정보 처리 및 보유기간은 다음과 같습니다.<br/>';
+			html  +='&nbsp;&nbsp;&nbsp;<strong style="color:blue;">- 구인·구직 게시글의 공개 기간 만료 후 7일 이내 파기</strong><br/>';
+			html  +='&nbsp;4. 동의거부 권리 및 동의거부에 따른 불이익<br/>';
+			html  +='&nbsp;선택 개인정보의 수집 및 이용에 대한 동의를 거부할 수 있습니다. 동의를 거부할 경우 구인·구직 신청을 할 수 없습니다.<br/>';
+			html  +='</p>';
+			html  +='</div>';
+			html  +='<div class="w_100p" style="display:inline-block;margin-top:10px;">';
+			html  +='<span style="font-size: 14px;">※ 아래와 같이 제3자에게 정보를 제공하는 데에 동의 하십니까?<br/><a style="float: right;" OnClick="javascript:countB();" id="personal_info_text_next" href="#personal_info_area_next" data-toggle="personal_info_next" class="link-tel"><strong style="color:blue;">(펼치기)</strong></a></span>';
+			html  +='<div style="margin-top: 10px;height: 35px;" class="radio_item w_100p">';
+			html  +='<div class="checks" style="margin-bottom: 1px;">';
+			html  +='<input type="radio" id="personal_info3_y" name="person_info3_yn" class="required" title="제3자에게 정보" value="Y" >';
+			html  +='<label for="personal_info3_y">동의</label>';
+			html  +='</div>';
+			html  +='</div>';
+			html  +='<div class="radio_item w_100p" style="height: 35px;">';
+			html  +='<div class="checks" style="margin-bottom: 1px;">';
+			html  +='<input type="radio" id="personal_info3_n" name="person_info3_yn" class="required" title="제3자에게 정보" value="N" checked>';
+			html  +='<label for="personal_info3_n">미동의(미동의 시 등록신청이 불가능합니다.)</label>';
+			html  +='</div>';
+			html  +='</div>';
+			html  +='</div>';
+			html  +='<div id="personal_info_area_next" style="display: none;padding:5px;font-size: 14px;border: 1px solid #000000;background-color:#f4f5f5;">';
+			html  +='<p>';
+			html  +='■ 개인정보의 제3자 제공안내 <br/>';
+			html  +='&nbsp;1. 개인정보를 제공받는자<br/>';
+			html  +='&nbsp;&nbsp;「직업안정법 시행령」 제28조에 따라 수집된 개인정보는 <strong style="color:blue;">‘건설기계 e-마당’의 회원에게 제공됩니다.</strong><br/>';
+			html  +='&nbsp;2. 개인정보를 제공받는 자의 개인정보 이용목적<br/>';
+			html  +='&nbsp;&nbsp;‘건설기계 e-마당’의 회원이 구인·구직관련 업무를 수행하기 위함<br/>';
+			html  +='&nbsp;3. 제공하는 개인정보의 항목<br/>';
+			html  +='&nbsp;&nbsp;<strong style="color:blue;">- 구인·구직자의 휴대전화번호 또는 전화번호, 이메일주소</strong><br/>';
+			html  +='&nbsp;4. 개인정보를 제공받는 자의 개인정보 보유 및 이용 기간<br/>';
+			html  +='&nbsp;&nbsp;<strong style="color:blue;">- 구인·구직 게시글의 공개 기간만료 시</strong><br/>';
+			html  +='&nbsp;5. 동의거부 권리 및 동의거부에 따른 불이익<br/>';
+			html  +='&nbsp;&nbsp;선택 개인정보의 수집 및 이용에 대한 동의를 거부할 수 있습니다. 동의를 거부할 경우 구인·구직 신청을 할 수 없습니다.<br/>';
+			html  +='</p>';
+			html  +='</div>';
+			html  +='<div style="margin-top: 8px;">※ 개인정보 수집·이용, 제3자 정보제공에 관한 상세내용을 확인하지 않으면 신청이 불가하므로, <strong style="color:blue;">상세내용(펼치기)을 확인</strong>하시기 바랍니다.</div>';
+			$("#personal_info_check").html(html);
+			
+			$('a[data-toggle="personal_info"]').on('click', function (e) {
+				if ($("#personal_info_area").css('display') == 'none') {
+					$("#personal_info_area").show();
+					$("#personal_info_text").html("(접기)");
+				} else {
+					$("#personal_info_area").hide();
+					$("#personal_info_text").html("(펼치기)");
+				}
+			});
+			
+			$('a[data-toggle="personal_info_next"]').on('click', function (e) {
+				if ($("#personal_info_area_next").css('display') == 'none') {
+					$("#personal_info_area_next").show();
+					$("#personal_info_text_next").html("(접기)");
+				} else {
+					$("#personal_info_area_next").hide();
+					$("#personal_info_text_next").html("(펼치기)");
+				}
+			});
+		},
+		makePersonalRentalHtml:function(){ //건설기계 임대차 신청 화면 하단의 문구 내용
+			let html ='';
+			html  +='<div class="w_100p" style="display:inline-block;margin-top:10px;">';
+			html  +='<span style="font-size: 14px;">※ 아래와 같이 개인정보를 수집·이용하는데 동의하십니까?<br/><a style="float: right;" OnClick="javascript:countA();" id="personal_info_text" href="#personal_info_area" data-toggle="personal_info" class="link-tel"><strong style="color:blue;">(펼치기)</strong></a></span>';
+			html  +='<div style="margin-top: 10px;height: 35px;" class="radio_item w_100p">';
+			html  +='	<div class="checks" style="margin-bottom: 1px;">';
+			html  +='		<input type="radio" id="personal_info_y" name="person_info_yn" class="required" title="개인정보 수집 동의 여부" value="Y" >';
+			html  +='<label for="personal_info_y">동의</label>';
+			html  +='</div>';
+			html  +='</div>';
+			html  +='<div class="radio_item w_100p" style="height: 35px;">';
+			html  +='<div class="checks" style="margin-bottom: 1px;">';
+			html  +='<input type="radio" id="personal_info_n" name="person_info_yn" class="required" title="개인정보 수집 동의 여부" value="N" checked>';
+			html  +='<label for="personal_info_n">미동의(미동의 시 등록신청이 불가능합니다.)</label>';
+			html  +='</div>';
+			html  +='</div>';
+			html  +='</div>';
+			html  +='<div id="personal_info_area" style="display: none;padding:5px;font-size: 14px;border: 1px solid #000000;background-color:#f4f5f5;">';
+			html  +='<p>';
+			html  +='■ 「개인정보보호법」 제15조(개인정보의 수집·이용)<br/>';
+			html  +='&nbsp;① 개인정보처리자는 다음 각 호의 어느 하나에 해당하는 경우에는 개인정보를 수집할 수 있으며 그 수집 목적의 범위에서 이용할 수 있다.<br/>';
+			html  +='&nbsp;&nbsp;1. 정보주체의 동의를 받은 경우<br/>';
+			html  +='&nbsp;&nbsp;2. 법률에 특별한 규정이 있거나 법령상 의무를 준수하기 위하여 불가피한 경우<br/><br/>';
+			html  +='■ 개인정보 수집·이용 안내<br/>';
+			html  +='&nbsp;1, 수집하는 개인정보의 항목 <br/>';
+			html  +='&nbsp;&nbsp;‘건설기계 e-마당’은 「전자상거래법」 제20조에 따라 아래와 같은 개인정보를 수집하고 있습니다.<br/>';
+			html  +='&nbsp;&nbsp;<strong style="color:blue;">- 필수정보 : 휴대전화번호, 전화번호, 이메일주소</strong><br/>';
+			html  +='&nbsp;2, 개인정보의 수집 이용목적<br/>';
+			html  +='&nbsp;&nbsp;‘건설기계 e-마당’에서 수집한 개인정보는 「전자상거래법」 제20조 및 동법 시행령 제25조에 따라 통신판매중개업자의 정보제공을 위해 활용됩니다.<br/>';
+			html  +='&nbsp;3. 개인정보의 보유 및 이용기간<br/>';
+			html  +='&nbsp;&nbsp;1) ‘건설기계 e-마당’은 법령에 따른 개인정보 보유이용기간 또는 정보주체로부터 개인정보를 수집 시에 동의 받은 개인정보 보유, 이용기간 내에서 개인정보를 처리, 보유합니다.<br/>';
+			html  +='&nbsp;&nbsp;2) 개인정보 처리 및 보유기간은 다음과 같습니다.<br/>';
+			html  +='&nbsp;&nbsp;<strong style="color:blue;">- 구인·구직 게시글의 공개 기간 만료 후 7일 이내 파기 </strong><br/>';
+			html  +='&nbsp;4. 동의거부 권리 및 동의거부에 따른 불이익<br/>';
+			html  +='&nbsp;&nbsp;선택 개인정보의 수집 및 이용에 대한 동의를 거부할 수 있습니다. 동의를 거부할 경우 임대차 신청을 할 수 없습니다.<br/>';
+			html  +='</p>';
+			html  +='</div>';
+			html  +='<div class="w_100p" style="display:inline-block;">';
+			html  +='<span style="font-size: 14px;">※ 아래와 같이 제3자에게 정보를 제공하는 데에 동의 하십니까?<br/><a style="float: right;" OnClick="javascript:countB();" id="personal_info_text_next" href="#personal_info_area_next" data-toggle="personal_info_next" class="link-tel"><strong style="color:blue;">(펼치기)</strong></a></span>';
+			html  +='<div style="margin-top: 10px;height: 35px;" class="radio_item w_100p">';
+			html  +='<div class="checks" style="margin-bottom: 1px;">';
+			html  +='<input type="radio" id="personal_info3_y" name="person_info3_yn" class="required" title="제3자에게 정보" value="Y" >';
+			html  +='<label for="personal_info3_y">동의</label>';
+			html  +='</div>';
+			html  +='</div>';
+			html  +='<div class="radio_item w_100p" style="height: 35px;">';
+			html  +='<div class="checks" style="margin-bottom: 1px;">';
+			html  +='<input type="radio" id="personal_info3_n" name="person_info3_yn" class="required" title="제3자에게 정보" value="N" checked>';
+			html  +='<label for="personal_info3_n">미동의(미동의 시 등록신청이 불가능합니다.)</label>';
+			html  +='</div>';
+			html  +='</div>';
+			html  +='</div>';
+			html  +='<div id="personal_info_area_next" style="display: none;padding:5px;font-size: 14px;border: 1px solid #000000;background-color:#f4f5f5;">';
+			html  +='<p>';
+			html  +='■ 개인정보의 제3자 제공안내<br/>';
+			html  +='&nbsp;1. 개인정보를 제공받는자<br/>';
+			html  +='&nbsp;&nbsp;「전자상거래법」 제20조에 따라 수집된 개인정보는 ‘건설기계 e-마당’의 회원에게 제공됩니다.<br/>';
+			html  +='&nbsp;2. 개인정보를 제공받는 자의 개인정보 이용목적<br/>';
+			html  +='&nbsp;&nbsp;‘건설기계 e-마당’의 회원이 임대차 신청 업무를 수행하기 위함<br/>';
+			html  +='&nbsp;3. 제공하는 개인정보의 항목<br/>';
+			html  +='&nbsp;&nbsp;<strong style="color:blue;">- 임대차 희망 회원의 휴대전화번호 또는 전화번호, 이메일주소</strong><br/>';
+			html  +='&nbsp;4. 개인정보를 제공받는 자의 개인정보 보유 및 이용 기간<br/>';
+			html  +='&nbsp;&nbsp;<strong style="color:blue;">- 임대차 신청 게시글의 공개 기간만료 시</strong><br/>';
+			html  +='&nbsp;5. 동의거부 권리 및 동의거부에 따른 불이익<br/>';
+			html  +='&nbsp;&nbsp;선택 개인정보의 수집 및 이용에 대한 동의를 거부할 수 있습니다. 동의를 거부할 경우 임대차 신청을 할 수 없습니다.<br/>';
+			html  +='</p>';
+			html  +='</div>';
+			html  +='<div style="margin-top: 8px;">※ 개인정보 수집·이용, 제3자 정보제공에 관한 상세내용을 확인하지 않으면 신청이 불가하므로, <strong style="color:blue;">상세내용(펼치기)을 확인</strong>하시기 바랍니다.</div>';
+			
+			
+			
+			$("#personal_info_check").html(html);
+			
+			$('a[data-toggle="personal_info"]').on('click', function (e) {
+				if ($("#personal_info_area").css('display') == 'none') {
+					$("#personal_info_area").show();
+					$("#personal_info_text").html("(접기)");
+				} else {
+					$("#personal_info_area").hide();
+					$("#personal_info_text").html("(펼치기)");
+				}
+			});
+			
+			$('a[data-toggle="personal_info_next"]').on('click', function (e) {
+				if ($("#personal_info_area_next").css('display') == 'none') {
+					$("#personal_info_area_next").show();
+					$("#personal_info_text_next").html("(접기)");
+				} else {
+					$("#personal_info_area_next").hide();
+					$("#personal_info_text_next").html("(펼치기)");
+				}
+			});
+		},	makePersonalPilotWebHtml:function(){ //건설기계 임대차 신청 화면 하단의 문구 내용
+			let html ='';
+			html  +='<div class="w_100p" style="margin-top:10px;">';
+			html  +='<span style="font-size: 14px;">※ 아래와 같이 개인정보를 수집·이용하는데 동의하십니까?<a  OnClick="javascript:countA();" id="personal_info_text" href="#personal_info_area" data-toggle="personal_info" class="link-tel"><strong style="color:blue;">(펼치기)</strong></a></span>';
+		
+			
+			html  +='<div style="margin-top: 10px;height: 35px;" class="radio_item w_100p">';
+			html  +='<label class="mt-radio mt-checkbox-outline" style="margin-right: 10px;" >'
+			html  +='<input type="radio" id="personal_info_y" name="person_info_yn" class="form-control required"  title="개인정보 수집 동의 여부" value="Y">'
+			html  +='동의<span></span>'
+			html  +='</label>'
+			html  +='<label class="mt-radio mt-checkbox-outline">'
+			html  +='<input type="radio" id="personal_info_n" name="person_info_yn" class="form-control required"  title="개인정보 수집 동의 여부"  checked value="N">'
+			html  +='미동의<span></span>'
+			html  +='</label>'	
+		    html  +='	<span style="font-size: 12px;margin-bottom: 0px; line-height: 20px;">(미동의 시 등록신청이 불가능합니다.)</span>'
+			html  +='</div>';
+			
+			html  +='<div id="personal_info_area" style="display: none;padding:5px;font-size: 14px;border: 1px solid #000000;background-color:#f4f5f5;">';
+			html  +='<p>';
+			html  +='■ 「개인정보보호법」 제15조(개인정보의 수집·이용)<br/>';
+			html  +='&nbsp;① 개인정보처리자는 다음 각 호의 어느 하나에 해당하는 경우에는 개인정보를 수집할 수 있으며 그 수집 목적의 범위에서 이용할 수 있다.<br/>';
+			html  +='&nbsp;&nbsp;1. 정보주체의 동의를 받은 경우<br/>';
+			html  +='&nbsp;&nbsp;2. 법률에 특별한 규정이 있거나 법령상 의무를 준수하기 위하여 불가피한 경우<br/><br/>';
+			html  +='■ 개인정보 수집·이용 안내<br/>';
+			html  +='&nbsp;1, 수집하는 개인정보의 항목 <br/>';
+			html  +='&nbsp;&nbsp;‘건설기계 e-마당’은 「직업안정법 시행령」 제28조에 따라 아래와 같은 개인정보를 수집하고 있습니다.<br/>';
+			html  +='&nbsp;&nbsp;&nbsp;<strong style="color:blue;">- 필수정보 : 휴대전화번호, 전화번호, 이메일주소</strong><br/>';
+			html  +='&nbsp;2, 개인정보의 수집 이용목적<br/>';
+			html  +='&nbsp;&nbsp;‘건설기계 e-마당’에서 수집한 개인정보는 「직업안정법 시행령」 제28조제2호에 따라 구인·구직의 광고활용을 위해 활용됩니다.<br/>';
+			html  +='&nbsp;3. 개인정보의 보유 및 이용기간<br/>';
+			html  +='&nbsp;&nbsp;1) ‘건설기계 e-마당’은 법령에 따른 개인정보 보유이용기간 또는 정보주체로부터 개인정보를 수집 시에 동의 받은 개인정보 보유, 이용기간 내에서 개인정보를 처리, 보유합니다.<br/>';
+			html  +='&nbsp;&nbsp;2) 개인정보 처리 및 보유기간은 다음과 같습니다.<br/>';
+			html  +='&nbsp;&nbsp;&nbsp;<strong style="color:blue;">- 구인·구직 게시글의 공개 기간 만료 후 7일 이내 파기</strong><br/>';
+			html  +='&nbsp;4. 동의거부 권리 및 동의거부에 따른 불이익<br/>';
+			html  +='&nbsp;선택 개인정보의 수집 및 이용에 대한 동의를 거부할 수 있습니다. 동의를 거부할 경우 구인·구직 신청을 할 수 없습니다.<br/>';
+			html  +='</p>';
+			html  +='</div>';
+			html  +='<div class="w_100p" style="margin-top:10px;">';
+			html  +='<span style="font-size: 14px;">※ 아래와 같이 제3자에게 정보를 제공하는 데에 동의 하십니까?<a  OnClick="javascript:countB();" id="personal_info_text_next" href="#personal_info_area_next" data-toggle="personal_info_next" class="link-tel"><strong style="color:blue;">(펼치기)</strong></a></span>';
+			
+			html  +='<div style="margin-top: 10px;height: 35px;" class="radio_item w_100p">';
+			html  +='<label class="mt-radio mt-checkbox-outline" style="margin-right: 10px;" >'
+			html  +='<input type="radio" id="personal_info3_y" name="person_info3_yn" class="form-control required"  title="개인정보 수집 동의 여부" value="Y">'
+			html  +='동의<span></span>'
+			html  +='</label>'
+			html  +='<label class="mt-radio mt-checkbox-outline">'
+			html  +='<input type="radio" id="personal_info3_n" name="person_info3_yn" class="form-control required"  title="개인정보 수집 동의 여부" checked  value="N">'
+			html  +='미동의<span></span>'
+			html  +='</label>'	
+			html  +='	<span style="font-size: 12px;margin-bottom: 0px; line-height: 20px;">(미동의 시 등록신청이 불가능합니다.)</span>'
+			html  +='</div>'
+			
+			html  +='<div id="personal_info_area_next" style="display: none;padding:5px;font-size: 14px;border: 1px solid #000000;background-color:#f4f5f5;">';
+			html  +='<p>';
+			html  +='■ 개인정보의 제3자 제공안내 <br/>';
+			html  +='&nbsp;1. 개인정보를 제공받는자<br/>';
+			html  +='&nbsp;&nbsp;「직업안정법 시행령」 제28조에 따라 수집된 개인정보는 <strong style="color:blue;">‘건설기계 e-마당’의 회원에게 제공됩니다.</strong><br/>';
+			html  +='&nbsp;2. 개인정보를 제공받는 자의 개인정보 이용목적<br/>';
+			html  +='&nbsp;&nbsp;‘건설기계 e-마당’의 회원이 구인·구직관련 업무를 수행하기 위함<br/>';
+			html  +='&nbsp;3. 제공하는 개인정보의 항목<br/>';
+			html  +='&nbsp;&nbsp;<strong style="color:blue;">- 구인·구직자의 휴대전화번호 또는 전화번호, 이메일주소</strong><br/>';
+			html  +='&nbsp;4. 개인정보를 제공받는 자의 개인정보 보유 및 이용 기간<br/>';
+			html  +='&nbsp;&nbsp;<strong style="color:blue;">- 구인·구직 게시글의 공개 기간만료 시</strong><br/>';
+			html  +='&nbsp;5. 동의거부 권리 및 동의거부에 따른 불이익<br/>';
+			html  +='&nbsp;&nbsp;선택 개인정보의 수집 및 이용에 대한 동의를 거부할 수 있습니다. 동의를 거부할 경우 구인·구직 신청을 할 수 없습니다.<br/>';
+			html  +='</p>';
+			html  +='</div>';
+			html  +='<div style="margin-top: 8px;">※ 개인정보 수집·이용, 제3자 정보제공에 관한 상세내용을 확인하지 않으면 신청이 불가하므로, <strong style="color:blue;">상세내용(펼치기)을 확인</strong>하시기 바랍니다.</div>';
+			
+			
+			
+			$("#personal_info_check").html(html);
+			
+			$('a[data-toggle="personal_info"]').on('click', function (e) {
+				if ($("#personal_info_area").css('display') == 'none') {
+					$("#personal_info_area").show();
+					$("#personal_info_text").html("<strong style='color:blue;'>(접기)</strong>"); 
+				} else {
+					$("#personal_info_area").hide();
+					$("#personal_info_text").html("<strong style='color:blue;'>(펼치기)</strong>");
+				}
+			});
+			
+			$('a[data-toggle="personal_info_next"]').on('click', function (e) {
+				if ($("#personal_info_area_next").css('display') == 'none') {
+					$("#personal_info_area_next").show();
+					$("#personal_info_text_next").html("<strong style='color:blue;'>(접기)</strong>");
+				} else {
+					$("#personal_info_area_next").hide();
+					$("#personal_info_text_next").html("<strong style='color:blue;'>(펼치기)</strong>");
+				}
+			});
+		},  
+		makePersonalRentalWebHtml:function(){ //건설기계 임대차 신청 화면 하단의 문구 내용
+			let html ='';
+			html  +='<div class="w_100p" style="margin-top:10px;">';
+			html  +='<span style="font-size: 14px;">※ 아래와 같이 개인정보를 수집·이용하는데 동의하십니까?<a  OnClick="javascript:countA();" id="personal_info_text" href="#personal_info_area" data-toggle="personal_info" class="link-tel"><strong style="color:blue;">(펼치기)</strong></a></span>';
+		
+			
+			html  +='<div style="margin-top: 10px;height: 35px;" class="radio_item w_100p">';
+			html  +='<label class="mt-radio mt-checkbox-outline" style="margin-right: 10px;" >'
+			html  +='<input type="radio" id="personal_info_y" name="person_info_yn" class="form-control required"  title="개인정보 수집 동의 여부" value="Y">'
+			html  +='동의<span></span>'
+			html  +='</label>'
+			html  +='<label class="mt-radio mt-checkbox-outline">'
+			html  +='<input type="radio" id="personal_info_n" name="person_info_yn" class="form-control required"  title="개인정보 수집 동의 여부"  checked value="N">'
+			html  +='미동의<span></span>'
+			html  +='</label>'	
+			html  +='	<span style="font-size: 12px;margin-bottom: 0px; line-height: 20px;">(미동의 시 등록신청이 불가능합니다.)</span>'
+			html  +='</div>';
+			
+			html  +='<div id="personal_info_area" style="display: none;padding:5px;font-size: 14px;border: 1px solid #000000;background-color:#f4f5f5;">';
+			html  +='<p>';
+			html  +='■ 「개인정보보호법」 제15조(개인정보의 수집·이용)<br/>';
+			html  +='&nbsp;① 개인정보처리자는 다음 각 호의 어느 하나에 해당하는 경우에는 개인정보를 수집할 수 있으며 그 수집 목적의 범위에서 이용할 수 있다.<br/>';
+			html  +='&nbsp;&nbsp;1. 정보주체의 동의를 받은 경우<br/>';
+			html  +='&nbsp;&nbsp;2. 법률에 특별한 규정이 있거나 법령상 의무를 준수하기 위하여 불가피한 경우<br/><br/>';
+			html  +='■ 개인정보 수집·이용 안내<br/>';
+			html  +='&nbsp;1, 수집하는 개인정보의 항목 <br/>';
+			html  +='&nbsp;&nbsp;‘건설기계 e-마당’은 「전자상거래법」 제20조에 따라 아래와 같은 개인정보를 수집하고 있습니다.<br/>';
+			html  +='&nbsp;&nbsp;<strong style="color:blue;">- 필수정보 : 휴대전화번호, 전화번호, 이메일주소</strong><br/>';
+			html  +='&nbsp;2, 개인정보의 수집 이용목적<br/>';
+			html  +='&nbsp;&nbsp;‘건설기계 e-마당’에서 수집한 개인정보는 「전자상거래법」 제20조 및 동법 시행령 제25조에 따라 통신판매중개업자의 정보제공을 위해 활용됩니다.<br/>';
+			html  +='&nbsp;3. 개인정보의 보유 및 이용기간<br/>';
+			html  +='&nbsp;&nbsp;1) ‘건설기계 e-마당’은 법령에 따른 개인정보 보유이용기간 또는 정보주체로부터 개인정보를 수집 시에 동의 받은 개인정보 보유, 이용기간 내에서 개인정보를 처리, 보유합니다.<br/>';
+			html  +='&nbsp;&nbsp;2) 개인정보 처리 및 보유기간은 다음과 같습니다.<br/>';
+			html  +='&nbsp;&nbsp;<strong style="color:blue;">- 임대차 신청 게시글의 공개 기간만료 시 즉시 파기</strong><br/>';
+			html  +='&nbsp;4. 동의거부 권리 및 동의거부에 따른 불이익<br/>';
+			html  +='&nbsp;&nbsp;선택 개인정보의 수집 및 이용에 대한 동의를 거부할 수 있습니다. 동의를 거부할 경우 임대차 신청을 할 수 없습니다.<br/>';
+			html  +='</p>';
+			html  +='</div>';
+			html  +='<div class="w_100p" style="margin-top:10px;">';
+			html  +='<span style="font-size: 14px;">※ 아래와 같이 제3자에게 정보를 제공하는 데에 동의 하십니까?<a  OnClick="javascript:countB();" id="personal_info_text_next" href="#personal_info_area_next" data-toggle="personal_info_next" class="link-tel"><strong style="color:blue;">(펼치기)</strong></a></span>';
+			
+			html  +='<div style="margin-top: 10px;height: 35px;" class="radio_item w_100p">';
+			html  +='<label class="mt-radio mt-checkbox-outline" style="margin-right: 10px;" >'
+			html  +='<input type="radio" id="personal_info3_y" name="person_info3_yn" class="form-control required"  title="개인정보 수집 동의 여부" value="Y">'
+			html  +='동의<span></span>'
+			html  +='</label>'
+			html  +='<label class="mt-radio mt-checkbox-outline">'
+			html  +='<input type="radio" id="personal_info3_n" name="person_info3_yn" class="form-control required"  title="개인정보 수집 동의 여부" checked  value="N">'
+			html  +='미동의<span></span>'
+			html  +='</label>'	
+			html  +='	<span style="font-size: 12px;margin-bottom: 0px; line-height: 20px;">(미동의 시 등록신청이 불가능합니다.)</span>'
+			html  +='</div>';
+			
+			html  +='<div id="personal_info_area_next" style="display: none;padding:5px;font-size: 14px;border: 1px solid #000000;background-color:#f4f5f5;">';
+			html  +='<p>';
+			html  +='■ 개인정보의 제3자 제공안내<br/>';
+			html  +='&nbsp;1. 개인정보를 제공받는자<br/>';
+			html  +='&nbsp;&nbsp;「전자상거래법」 제20조에 따라 수집된 개인정보는 ‘건설기계 e-마당’의 회원에게 제공됩니다.<br/>';
+			html  +='&nbsp;2. 개인정보를 제공받는 자의 개인정보 이용목적<br/>';
+			html  +='&nbsp;&nbsp;‘건설기계 e-마당’의 회원이 임대차 신청 업무를 수행하기 위함<br/>';
+			html  +='&nbsp;3. 제공하는 개인정보의 항목<br/>';
+			html  +='&nbsp;&nbsp;<strong style="color:blue;">- 임대차 희망 회원의 휴대전화번호 또는 전화번호, 이메일주소</strong><br/>';
+			html  +='&nbsp;4. 개인정보를 제공받는 자의 개인정보 보유 및 이용 기간<br/>';
+			html  +='&nbsp;&nbsp;<strong style="color:blue;">- 임대차 신청 게시글의 공개 기간만료 시</strong><br/>';
+			html  +='&nbsp;5. 동의거부 권리 및 동의거부에 따른 불이익<br/>';
+			html  +='&nbsp;&nbsp;선택 개인정보의 수집 및 이용에 대한 동의를 거부할 수 있습니다. 동의를 거부할 경우 임대차 신청을 할 수 없습니다.<br/>';
+			html  +='</p>';
+			html  +='</div>';
+			html  +='<div style="margin-top: 8px;">※ 개인정보 수집·이용, 제3자 정보제공에 관한 상세내용을 확인하지 않으면 신청이 불가하므로, <strong style="color:blue;">상세내용(펼치기)을 확인</strong>하시기 바랍니다.</div>';
+			
+			
+			
+			$("#personal_info_check").html(html);
+			
+			$('a[data-toggle="personal_info"]').on('click', function (e) {
+				if ($("#personal_info_area").css('display') == 'none') {
+					$("#personal_info_area").show();
+					$("#personal_info_text").html("<strong style='color:blue;'>(접기)</strong>"); 
+				} else {
+					$("#personal_info_area").hide();
+					$("#personal_info_text").html("<strong style='color:blue;'>(펼치기)</strong>");
+				}
+			});
+			
+			$('a[data-toggle="personal_info_next"]').on('click', function (e) {
+				if ($("#personal_info_area_next").css('display') == 'none') {
+					$("#personal_info_area_next").show();
+					$("#personal_info_text_next").html("<strong style='color:blue;'>(접기)</strong>");
+				} else {
+					$("#personal_info_area_next").hide();
+					$("#personal_info_text_next").html("<strong style='color:blue;'>(펼치기)</strong>");
+				}
+			});
+		}, 
+		saveCheckInfo:function() { //저장시 체크
+			
+			if (ca < 1) {
+				alert("개인정보 수집 내용을 펼치기하여 상세내용을 확인해 주세요");
+				return false;
+			}
+			
+			if (cb < 1) {
+				alert("제3자에게 정보 제공 내용을 펼치기하여 상세내용을 확인해 주세요");
+				return false;
+			}
+			
+			let isSave = true;
+			if ($("input[name=person_info_yn]:checked").val() === 'N') {
+				alert("개인정보 수집 미동의시 신청 불가합니다.");
+				return false;
+			}
+			if ($("input[name=person_info3_yn]:checked").val() === 'N') {
+				alert("제3자에게 정보 제공 미동의시 신청 불가합니다.");
+				return false;
+			}
+			return isSave;
+		}
+	}
+}
+
+
+
